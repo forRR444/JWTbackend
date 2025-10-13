@@ -23,6 +23,10 @@ module Backend
     # Cookieを処理するmiddleware
     config.middleware.use ActionDispatch::Cookies
 
+    # Cookieのsamesite属性を変更する(開発環境でnoneを使用するとCookieの共有ができない)
+    config.action_dispatch.cookies_same_site_protection =
+    ENV["COOKIES_SAME_SITE"].to_sym if Rails.env.production?
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
