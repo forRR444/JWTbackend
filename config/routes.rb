@@ -9,6 +9,9 @@ Rails.application.routes.draw do
 
       #projects
       resources :projects, only: [:index]
+      
+      #users
+      get 'me', to: 'users#me'
     end
   end
 end
