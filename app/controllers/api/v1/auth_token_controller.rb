@@ -50,6 +50,7 @@ class Api::V1::AuthTokenController < ApplicationController
     end
 
     # refresh_tokenをcookieにセットする
+
     def set_refresh_token_to_cookie
       cookies[session_key] = {
         value: refresh_token,
@@ -58,6 +59,7 @@ class Api::V1::AuthTokenController < ApplicationController
         http_only: true
       }
     end
+
 
     # ログイン時のデフォルトレスポンス
     def login_response
