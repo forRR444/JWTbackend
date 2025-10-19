@@ -7,6 +7,7 @@ class User < ApplicationRecord
   # gem bcrypt
   # 新規登録の時は、allow_nil: trueがあってもpasswordのバリデーションが働く
   has_secure_password
+  has_many :meals, dependent: :destroy
 
   # validates
   validates :name, presence: true,

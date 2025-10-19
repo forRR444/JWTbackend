@@ -9,6 +9,7 @@ Rails.application.routes.draw do
 
       #projects
       resources :projects, only: [:index]
+      resources :meals, only: [:index, :create, :update, :destroy, :show]
       #users
       get 'me', to: 'users#me'
 
