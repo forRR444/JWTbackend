@@ -9,9 +9,10 @@ Rails.application.routes.draw do
 
       #projects
       resources :projects, only: [:index]
-      
       #users
       get 'me', to: 'users#me'
+
+      resources :users, only: [:create]
     end
   end
 end
