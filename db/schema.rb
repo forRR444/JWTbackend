@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_09_032625) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_19_071722) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -20,6 +20,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_09_032625) do
     t.integer "salary"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "meals", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "meal_type", default: "other", null: false
+    t.text "content", null: false
+    t.integer "calories"
+    t.integer "grams"
+    t.string "tags_text"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "created_at"], name: "index_meals_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_meals_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -32,4 +45,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_09_032625) do
     t.datetime "updated_at", null: false
     t.string "refresh_jti"
   end
+
+  add_foreign_key "meals", "users"
 end
