@@ -1,4 +1,4 @@
-# Cookie経由でのリフレッシュトークン処理を提供
+# Cookie経由でのリフレッシュトークン処理
 # UsersControllerとAuthTokenControllerで共通利用
 module TokenCookieHandler
   extend ActiveSupport::Concern
