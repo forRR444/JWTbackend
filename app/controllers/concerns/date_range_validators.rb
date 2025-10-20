@@ -1,4 +1,4 @@
-# 日付パラメータのバリデーションと解析を提供
+# 日付パラメータのバリデーションと解析
 module DateRangeValidators
   extend ActiveSupport::Concern
 
