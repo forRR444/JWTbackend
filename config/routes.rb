@@ -9,7 +9,13 @@ Rails.application.routes.draw do
 
       #projects
       resources :projects, only: [:index]
-      resources :meals, only: [:index, :create, :update, :destroy, :show]
+      # meals（←ここを拡張）
+      resources :meals, only: [:index, :create, :update, :destroy, :show] do
+        collection do
+          get :summary   # /api/v1/meals/summary
+          get :calendar  # /api/v1/meals/calendar
+        end
+      end
       #users
       get 'me', to: 'users#me'
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_19_071722) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_19_091142) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -31,7 +31,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_19_071722) do
     t.string "tags_text"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.date "eaten_on", default: -> { "CURRENT_DATE" }, null: false
     t.index ["user_id", "created_at"], name: "index_meals_on_user_id_and_created_at"
+    t.index ["user_id", "eaten_on"], name: "index_meals_on_user_id_and_eaten_on"
     t.index ["user_id"], name: "index_meals_on_user_id"
   end
 

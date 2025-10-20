@@ -3,9 +3,9 @@ class Meal < ApplicationRecord
 
   MEAL_TYPES = %w[breakfast lunch dinner snack other].freeze
 
-  # enum 代替（文字列）: DBをシンプルに保つ
   validates :meal_type, inclusion: { in: MEAL_TYPES }
   validates :content, presence: true
+  validates :eaten_on, presence: true
 
   # タグは内部的にカンマ区切りで保存、外部APIは配列で返す
   def tags
@@ -15,6 +15,11 @@ class Meal < ApplicationRecord
   def tags=(arr)
     self.tags_text = Array(arr).map(&:to_s).map(&:strip).reject(&:empty?).uniq.join(",")
   end
+
+  # スコープ
+  scope :for_user, ->(user) { where(user_id: user.id) }
+  scope :on, ->(date) { where(eaten_on: date) }
+  scope :between, ->(from, to) { where(eaten_on: from..to) }
 
   def as_json(options = {})
     super({ only: [:id, :meal_type, :content, :calories, :grams, :created_at, :updated_at] }.merge(options)).merge({
