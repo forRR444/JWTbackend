@@ -27,9 +27,6 @@ module UserAuth
     end
 
     # 暗号化クラスの生成
-    # Doc: https://api.rubyonrails.org/v6.1.0/classes/ActiveSupport/MessageEncryptor.html
-    # key_generatorメソッドのsecretはsecret_key_baseが使われる
-    # 参考: https://techracho.bpsinc.jp/hachi8833/2017_10_24/46809
     def crypt
       salt = "signed user id"
       key_length = ActiveSupport::MessageEncryptor.key_len
@@ -59,6 +56,5 @@ module UserAuth
         alg: algorithm
       }
     end
-
   end
 end

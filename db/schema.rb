@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_22_101809) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_25_061734) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -26,14 +26,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_22_101809) do
     t.datetime "updated_at", null: false
     t.index ["index_number"], name: "index_foods_on_index_number", unique: true
     t.index ["name"], name: "index_foods_on_name"
-  end
-
-  create_table "jobs", force: :cascade do |t|
-    t.string "title"
-    t.string "category"
-    t.integer "salary"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "meals", force: :cascade do |t|
@@ -67,6 +59,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_22_101809) do
     t.decimal "target_protein", precision: 8, scale: 1, comment: "目標たんぱく質 (g)"
     t.decimal "target_fat", precision: 8, scale: 1, comment: "目標脂質 (g)"
     t.decimal "target_carbohydrate", precision: 8, scale: 1, comment: "目標炭水化物 (g)"
+    t.index ["email"], name: "index_users_on_email", unique: true
   end
 
   add_foreign_key "meals", "users"
