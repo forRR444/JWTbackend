@@ -1,10 +1,10 @@
 class Api::V1::AuthTokenController < ApplicationController
-  include UserSessionizeService
-  include TokenCookieHandler
+  include UserSessionizeService # セッションからユーザーを取得する処理
+  include TokenCookieHandler # Cookieでリフレッシュトークンを管理する処理
 
-  # 404エラーが発生した場合にヘッダーのみを返す
+  # refresh_tokenのUserNotFoundErrorが発生した場合は404を返す
   rescue_from UserAuth.not_found_exception_class, with: :not_found
-  # refresh_tokenのInvalidJitErrorが発生した場合はカスタムエラーを返す
+  # refresh_tokenのInvalidJtiErrorが発生した場合はカスタムエラーを返す
   rescue_from JWT::InvalidJtiError, with: :invalid_jti
 
   # userのログイン情報を確認する
@@ -17,62 +17,61 @@ class Api::V1::AuthTokenController < ApplicationController
   # ログイン
   def create
     @user = login_user
-    set_refresh_token_cookie(@user)
-    render json: login_response
+    set_refresh_token_cookie(@user) # Cookieにリフレッシュトークンを保存
+    render json: login_response # アクセストークンを返す
   end
 
   # リフレッシュ
   def refresh
     @user = session_user
-    set_refresh_token_cookie(@user)
-    render json: login_response
+    set_refresh_token_cookie(@user) # 新しいリフレッシュトークンを設定
+    render json: login_response # 新しいアクセストークンを返す
   end
 
   # ログアウト
   def destroy
-    session_user.forget
-    delete_refresh_token_cookie
+    session_user.forget # DBのjti削除
+    delete_refresh_token_cookie # Cookie削除
     head :ok
   end
 
   private
-
-  # params[:email]からアクティブなユーザーを返す
-  def login_user
-    @_login_user ||= User.find_by_activated(auth_params[:email])
-  end
-
-  # ログインユーザーが居ない、もしくはpasswordが一致しない場合404を返す
-  def authenticate
-    unless login_user.present? &&
-            login_user.authenticate(auth_params[:password])
-      raise UserAuth.not_found_exception_class
+    # email から有効なユーザーを探す
+    def login_user
+      @_login_user ||= User.find_by_activated(auth_params[:email])
     end
-  end
 
-  # ログイン時のデフォルトレスポンス
-  def login_response
-    access = @user.encode_access_token
-    {
-      token: access.token,
-      expires: access.payload[:exp],
-      user: @user.response_json(sub: access.payload[:sub])
-    }
-  end
+    # ユーザーが存在しないかパスワード不一致なら404を返す
+    def authenticate
+      unless login_user.present? &&
+              login_user.authenticate(auth_params[:password])
+        raise UserAuth.not_found_exception_class
+      end
+    end
 
-  # 404ヘッダーのみの返却を行う
-  # Doc: https://gist.github.com/mlanett/a31c340b132ddefa9cca
-  def not_found
-    head(:not_found)
-  end
+    # ログイン時のレスポンス
+    def login_response
+      access = @user.encode_access_token
+      {
+        token: access.token, # アクセストークン文字列
+        expires: access.payload[:exp], # 有効期限
+        user: @user.response_json(sub: access.payload[:sub]) # ユーザー情報
+      }
+    end
 
-  # decode jti != user.refresh_jti のエラー処理
-  def invalid_jti
-    msg = "Invalid jti for refresh token"
-    render status: 401, json: { status: 401, error: msg }
-  end
+    # 404レスポンス
+    # Doc: https://gist.github.com/mlanett/a31c340b132ddefa9cca
+    def not_found
+      head(:not_found)
+    end
 
-  def auth_params
-    params.require(:auth).permit(:email, :password)
-  end
+    # 401レスポンス（jti無効時）
+    def invalid_jti
+      msg = "Invalid jti for refresh token"
+      render status: 401, json: { status: 401, error: msg }
+    end
+    # ログイン時に受け取るパラメータ(email, password)
+    def auth_params
+      params.require(:auth).permit(:email, :password)
+    end
 end

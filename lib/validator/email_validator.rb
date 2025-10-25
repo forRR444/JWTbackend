@@ -8,7 +8,6 @@ class EmailValidator < ActiveModel::EachValidator
     format = /\A\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*\z/
     record.errors.add(attribute, :invalid) unless format =~ value # =~ 文字列と正規表現が一致するか判定する演算子
 
-    # uniqueness
-    record.errors.add(attribute, :taken) if record.email_activated?
+    # uniqueness チェックは User モデルの validates :email, uniqueness: true で行う
   end
 end

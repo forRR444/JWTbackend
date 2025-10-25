@@ -9,9 +9,9 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     @access_token_key = "token"
   end
 
-  # プロジェクトapi
-  def projects_api(token)
-    get api("/projects"), xhr: true, headers: auth(token)
+  # ユーザー情報取得api（認証テスト用）
+  def me_api(token)
+    get api("/me"), xhr: true, headers: auth(token)
   end
 
   # 認証メソッドテスト
@@ -20,7 +20,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     access_token = res_body[@access_token_key]
 
     # 有効なtokenでアクセスできているか
-    projects_api(access_token)
+    me_api(access_token)
     assert_response 200
     assert response.body.present?
 
@@ -30,7 +30,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
       assert_not cookies[@session_key].blank?
 
       # レスポンスは想定通りか
-      projects_api(access_token)
+      me_api(access_token)
       assert_response 401
       assert_not response.body.present?
 
@@ -40,7 +40,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
 
     # 不正なtokenが投げられた場合
     invalid_token = "a." + access_token
-    projects_api(invalid_token)
+    me_api(invalid_token)
 
     assert_response 401
     assert_not response.body.present?

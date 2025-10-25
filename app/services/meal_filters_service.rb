@@ -1,7 +1,9 @@
-# 食事データのフィルタリングロジックを提供
-# 日付、日付範囲、デフォルトのフィルタリングに対応
+# 食事データのフィルタリングを担当するサービスクラス
+# 指定日・日付範囲・デフォルト（全件）で絞り込みを行う
+
 class MealFiltersService
-  # @param user [User] フィルタ対象のユーザー
+  # @param user [User] ログインユーザー
+  # @param params [ActionController::Parameters] フィルタリング用パラメータ
   def initialize(user, params)
     @user = user
     @params = params
@@ -10,50 +12,50 @@ class MealFiltersService
   # @return [ActiveRecord::Relation] フィルタ済みの食事データ
   def call
     case
-    when single_date? then filter_by_date
-    when date_range? then filter_by_range
-    else default_filter
+    when single_date? then filter_by_date # 単一日指定
+    when date_range? then filter_by_range # 日付範囲指定
+    else default_filter # 指定なし（全件）
     end
   end
 
   private
+    # 単一日フィルタか？
+    def single_date?
+      @params[:date].present?
+    end
+    # 日付範囲フィルタか？
+    def date_range?
+      @params[:from].present? && @params[:to].present?
+    end
 
-  def single_date?
-    @params[:date].present?
-  end
+    # 単一日で絞り込み
+    def filter_by_date
+      date = parse_date(@params[:date])
+      return @user.meals.none if date.nil?
 
-  def date_range?
-    @params[:from].present? && @params[:to].present?
-  end
+      @user.meals.on(date).order(created_at: :desc)
+    end
 
-  # 特定の日付でフィルタ
-  def filter_by_date
-    date = parse_date(@params[:date])
-    return @user.meals.none if date.nil?
+    # 日付範囲で絞り込み
+    def filter_by_range
+      from_date = parse_date(@params[:from])
+      to_date = parse_date(@params[:to])
 
-    @user.meals.on(date).order(created_at: :desc)
-  end
+      return @user.meals.none if from_date.nil? || to_date.nil?
+      return @user.meals.none if from_date > to_date
 
-  # 日付範囲でフィルタ
-  def filter_by_range
-    from_date = parse_date(@params[:from])
-    to_date = parse_date(@params[:to])
+      @user.meals.between(from_date, to_date).order(created_at: :desc)
+    end
 
-    return @user.meals.none if from_date.nil? || to_date.nil?
-    return @user.meals.none if from_date > to_date
+    # デフォルト（全件・新しい順）
+    def default_filter
+      @user.meals.order(created_at: :desc)
+    end
 
-    @user.meals.between(from_date, to_date).order(created_at: :desc)
-  end
-
-  # デフォルトフィルタ（全件、新しい順）
-  def default_filter
-    @user.meals.order(created_at: :desc)
-  end
-
-  # 日付文字列を安全にパース
-  def parse_date(date_string)
-    Date.parse(date_string)
-  rescue ArgumentError
-    nil
-  end
+    # 日付文字列をDateオブジェクトに変換（不正な場合はnilを返す）
+    def parse_date(date_string)
+      Date.parse(date_string)
+    rescue ArgumentError
+      nil
+    end
 end

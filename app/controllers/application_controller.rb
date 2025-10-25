@@ -1,13 +1,12 @@
 class ApplicationController < ActionController::API
-  #cookieを扱う
+  # cookieを扱う
   include ActionController::Cookies
   # 認証を行う
-  include UserAuthenticateService 
+  include UserAuthenticateService
   # CSRF対策
   before_action :xhr_request?
 
   private
-
     # XMLHttpRequestでない場合は403エラーを返す
     def xhr_request?
       # リクエストヘッダ X-Requested-With: 'XMLHttpRequest' の存在を判定
@@ -24,7 +23,4 @@ class ApplicationController < ActionController::API
     def not_found
       render status: 404, json: { status: 404, error: "Not Found" }
     end
-
-
-
 end

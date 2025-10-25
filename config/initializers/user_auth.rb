@@ -35,7 +35,7 @@ module UserAuth
   mattr_accessor :token_public_key
   self.token_public_key = nil
 
-  # ユーザーが見つからない場合のエラーを指定
+  # ユーザーが見つからない場合のエラー
   mattr_accessor :not_found_exception_class
   self.not_found_exception_class = ActiveRecord::RecordNotFound
 end
