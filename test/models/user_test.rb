@@ -91,37 +91,42 @@ class UserTest < ActiveSupport::TestCase
     assert user.email == email.downcase
   end
 
-  test "active_user_uniqueness" do
-    # アクティブユーザー = activated: true
+  test "email_uniqueness" do
+    # メールアドレスは常に一意（activated に関わらず）
     email = "test@example.com"
-    # アクティブユーザーいない場合、同じemailが保存できているか
-    count = 3
-    assert_difference("User.count", count) do
-      count.times do |n|
-        user = User.create(name: "test#{n}", email: email, password: "password")
-      end
+
+    # 最初のユーザーは作成できる
+    assert_difference("User.count", 1) do
+      User.create(name: "test1", email: email, password: "password")
     end
 
-    # アクティブユーザーいる場合、同じemailでバリデーションエラーを吐いているか
-    active_user = User.find_by(email: email)
-    active_user.update!(activated: true)
-    assert active_user.activated
-
+    # 同じメールアドレスで2人目は作成できない（activated に関わらず）
     assert_no_difference("User.count") do
-      user = User.new(name: "test", email: email, password: "password")
+      user = User.new(name: "test2", email: email, password: "password")
       user.save
       uniqueness_msg = [ "メールアドレスはすでに存在します" ]
       assert_equal(uniqueness_msg, user.errors.full_messages)
     end
 
-    # アクティブユーザーいなくなった場合、同じemailが保存できているか
-    active_user.destroy!
-    assert_difference("User.count", 1) do
-      user = User.create(name: "test", email: email, password: "password", activated: true)
+    # activated: true でも同じメールアドレスは作成できない
+    first_user = User.find_by(email: email)
+    first_user.update!(activated: true)
+
+    assert_no_difference("User.count") do
+      user = User.new(name: "test3", email: email, password: "password", activated: true)
+      user.save
+      uniqueness_msg = [ "メールアドレスはすでに存在します" ]
+      assert_equal(uniqueness_msg, user.errors.full_messages)
     end
 
-    # アクティブユーザーのemailの一意性は保たれているか
-    assert_equal(1, User.where(email: email, activated: true).count)
+    # ユーザーを削除すると、同じメールアドレスで作成可能になる
+    first_user.destroy!
+    assert_difference("User.count", 1) do
+      User.create(name: "test4", email: email, password: "password", activated: true)
+    end
+
+    # メールアドレスの一意性は保たれているか
+    assert_equal(1, User.where(email: email).count)
   end
 
   test "password_validation" do
