@@ -1,4 +1,4 @@
-require "validator/email_validator"
+require "email_validator"
 
 class User < ApplicationRecord
   # トークン生成機能（JWT関連）を追加
