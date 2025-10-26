@@ -1,0 +1,6 @@
+attributes:
+  primary_keys: true
+  foreign_keys: true
+  timestamps: false
+orientation: horizontal
+title: "MyApp Domain Model"

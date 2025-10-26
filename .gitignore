@@ -34,3 +34,6 @@
 # Ignore Excel data files (large files for data import)
 *.xlsx
 *.xls
+
+# フォルダ設定ふぁいる
+.DS_Store
