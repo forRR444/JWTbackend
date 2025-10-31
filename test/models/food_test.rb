@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 class FoodTest < ActiveSupport::TestCase
@@ -58,7 +60,7 @@ class FoodTest < ActiveSupport::TestCase
     assert duplicate.errors[:index_number].present?
 
     # 異なるindex_numberなら登録できる
-    duplicate.index_number = 999999
+    duplicate.index_number = 999_999
     assert duplicate.valid?
   end
 
@@ -126,7 +128,7 @@ class FoodTest < ActiveSupport::TestCase
 
   # search_by_nameスコープの大文字小文字の扱いを検証
   test "scope search_by_name case sensitivity" do
-    food_en = Food.create!(
+    Food.create!(
       food_code: "03003",
       index_number: 3,
       name: "Chicken Breast",

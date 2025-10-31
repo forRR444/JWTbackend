@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 class MealCalendarServiceTest < ActiveSupport::TestCase
@@ -23,7 +25,7 @@ class MealCalendarServiceTest < ActiveSupport::TestCase
   # 日付キーに統計情報が含まれることを検証
   test "days contain date keys with statistics" do
     # 今月の食事を作成
-    meal = @user.meals.create!(
+    @user.meals.create!(
       meal_type: "breakfast",
       content: "Test meal",
       eaten_on: @today
@@ -117,14 +119,14 @@ class MealCalendarServiceTest < ActiveSupport::TestCase
   # 指定月の食事のみ含まれることを検証
   test "only includes meals from specified month" do
     # 今月と来月の食事を作成
-    this_month_meal = @user.meals.create!(
+    @user.meals.create!(
       meal_type: "breakfast",
       content: "This month",
       eaten_on: @today
     )
 
     next_month = @today >> 1
-    next_month_meal = @user.meals.create!(
+    @user.meals.create!(
       meal_type: "breakfast",
       content: "Next month",
       eaten_on: next_month
@@ -230,7 +232,7 @@ class MealCalendarServiceTest < ActiveSupport::TestCase
     day2 = @first_of_month + 1
     day3 = @first_of_month + 2
 
-    [ day1, day2, day3 ].each do |day|
+    [day1, day2, day3].each do |day|
       @user.meals.create!(meal_type: "breakfast", content: "Breakfast", eaten_on: day)
       @user.meals.create!(meal_type: "lunch", content: "Lunch", eaten_on: day)
     end
@@ -240,7 +242,7 @@ class MealCalendarServiceTest < ActiveSupport::TestCase
 
     days = result[:days]
 
-    [ day1, day2, day3 ].each do |day|
+    [day1, day2, day3].each do |day|
       day_data = days[day.to_s]
       assert_equal 2, day_data[:total]
       assert_equal 1, day_data[:by_type]["breakfast"]
@@ -314,7 +316,7 @@ class MealCalendarServiceTest < ActiveSupport::TestCase
     result = service.call
 
     days = result[:days]
-    days.keys.each do |date_key|
+    days.each_key do |date_key|
       # YYYY-MM-DD 形式であることを確認
       assert_match(/^\d{4}-\d{2}-\d{2}$/, date_key)
     end

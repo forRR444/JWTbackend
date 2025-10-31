@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UserFood < ApplicationRecord
   # リレーション
   belongs_to :user
@@ -11,7 +13,7 @@ class UserFood < ApplicationRecord
   validates :default_grams, numericality: { greater_than: 0, allow_nil: true }
 
   # スコープ
-  scope :search_by_name, ->(query) {
+  scope :search_by_name, lambda { |query|
     where("name ILIKE ?", "%#{sanitize_sql_like(query)}%") if query.present?
   }
 

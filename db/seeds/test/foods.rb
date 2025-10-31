@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # テスト用食品データ
 foods_data = [
   {

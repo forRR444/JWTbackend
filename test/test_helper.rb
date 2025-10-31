@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
@@ -21,12 +23,12 @@ module ActiveSupport
     # アクティブなユーザーを返す
     def active_user
       User.find_by(activated: true) ||
-      User.create!(
-      name: "Test User",
-      email: "testuser@example.com",
-      password: "password",
-      activated: true
-    )
+        User.create!(
+          name: "Test User",
+          email: "testuser@example.com",
+          password: "password",
+          activated: true
+        )
     end
 
     # api path

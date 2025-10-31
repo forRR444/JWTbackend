@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MealTag < ApplicationRecord
   # リレーション
   belongs_to :meal

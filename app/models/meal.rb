@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Meal < ApplicationRecord
   belongs_to :user
   has_many :meal_tags, dependent: :destroy
@@ -42,9 +44,9 @@ class Meal < ApplicationRecord
   def tag_names=(names)
     # 配列に変換し、空白をトリム、空の値を除外、重複を削除
     cleaned_names = Array(names)
-      .map { |name| name.to_s.strip }
-      .reject(&:blank?)
-      .uniq
+                    .map { |name| name.to_s.strip }
+                    .reject(&:blank?)
+                    .uniq
 
     # 空の場合はクリア
     if cleaned_names.empty?
@@ -54,7 +56,7 @@ class Meal < ApplicationRecord
 
     tag_objects = Tag.find_or_create_by_names(cleaned_names)
     # 既存の関連を置き換え
-    self.meal_tags.destroy_all
+    meal_tags.destroy_all
     tag_objects.each do |tag|
       meal_tags.build(tag: tag)
     end
@@ -86,18 +88,18 @@ class Meal < ApplicationRecord
   # レスポンス用JSONを生成（タグを配列で含む）
   def as_json(options = {})
     base_attributes = {
-      only: [
-        :id,
-        :meal_type,
-        :content,
-        :calories,
-        :grams,
-        :protein,
-        :fat,
-        :carbohydrate,
-        :eaten_on,
-        :created_at,
-        :updated_at
+      only: %i[
+        id
+        meal_type
+        content
+        calories
+        grams
+        protein
+        fat
+        carbohydrate
+        eaten_on
+        created_at
+        updated_at
       ]
     }
 

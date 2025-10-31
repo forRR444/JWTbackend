@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 table_names = %w[users foods meals]
 
 table_names.each do |table_name|

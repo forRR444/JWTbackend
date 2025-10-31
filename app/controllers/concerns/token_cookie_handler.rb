@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 # Cookie経由でのリフレッシュトークン処理
 module TokenCookieHandler
   extend ActiveSupport::Concern
 
   private
+
   # リフレッシュトークンをHttpOnly Cookieに設定
   def set_refresh_token_cookie(user)
     refresh = user.encode_refresh_token # トークン生成

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module UserAuthenticateService
   # 認証（ログイン中ユーザーがいるか確認）
   def authenticate_user
@@ -11,29 +13,31 @@ module UserAuthenticateService
   end
 
   private
-    # リクエストヘッダーからトークンを取得
-    def token_from_request_headers
-      request.headers["Authorization"]&.split&.last
-    end
 
-    # トークンからユーザーを取得（無効ならnil）
-    def fetch_user_from_access_token
-      User.from_access_token(token_from_request_headers)
-    # 見つからない場合nilを返す
-    rescue UserAuth.not_found_exception_class,
-           JWT::DecodeError, JWT::EncodeError
-      nil
-    end
+  # リクエストヘッダーからトークンを取得
+  def token_from_request_headers
+    request.headers["Authorization"]&.split&.last
+  end
 
-    # アクセストークンのユーザーを返す
-    def current_user
-      return nil unless token_from_request_headers
-      @_current_user ||= fetch_user_from_access_token
-    end
+  # トークンからユーザーを取得（無効ならnil）
+  def fetch_user_from_access_token
+    User.from_access_token(token_from_request_headers)
+  # 見つからない場合nilを返す
+  rescue UserAuth.not_found_exception_class,
+         JWT::DecodeError, JWT::EncodeError
+    nil
+  end
 
-    # 認証失敗時の処理（Cookie削除 + 401返却）
-    def unauthorized_user
-      cookies.delete(UserAuth.session_key)
-      head(:unauthorized)
-    end
+  # アクセストークンのユーザーを返す
+  def current_user
+    return nil unless token_from_request_headers
+
+    @current_user ||= fetch_user_from_access_token
+  end
+
+  # 認証失敗時の処理（Cookie削除 + 401返却）
+  def unauthorized_user
+    cookies.delete(UserAuth.session_key)
+    head(:unauthorized)
+  end
 end
