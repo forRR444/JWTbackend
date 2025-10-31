@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "jwt"
 
 module UserAuth
@@ -29,63 +31,64 @@ module UserAuth
     end
 
     private
-      # リフレッシュトークンの有効期限
-      def token_lifetime
-        UserAuth.refresh_token_lifetime
-      end
 
-      # 有効期限をUnixtimeで返す
-      def token_expiration
-         token_lifetime.from_now.to_i
-      end
+    # リフレッシュトークンの有効期限
+    def token_lifetime
+      UserAuth.refresh_token_lifetime
+    end
 
-      # jwt_idの生成
-      # Digest::MD5.hexdigest => 複合不可のハッシュを返す
-      # SecureRandom.uuid => 一意性の値を返す
-      def jwt_id
-        Digest::MD5.hexdigest(SecureRandom.uuid)
-      end
+    # 有効期限をUnixtimeで返す
+    def token_expiration
+      token_lifetime.from_now.to_i
+    end
 
-      # エンコード時のデフォルトクレーム
-      def claims
-        {
-          user_claim => @user_id,
-          jti: jwt_id,
-          exp: token_expiration
-        }
-      end
+    # jwt_idの生成
+    # Digest::MD5.hexdigest => 複合不可のハッシュを返す
+    # SecureRandom.uuid => 一意性の値を返す
+    def jwt_id
+      Digest::MD5.hexdigest(SecureRandom.uuid)
+    end
 
-      # @payloadのjtiを返す
-      def payload_jti
-        @payload.with_indifferent_access[:jti]
-      end
+    # エンコード時のデフォルトクレーム
+    def claims
+      {
+        user_claim => @user_id,
+        jti: jwt_id,
+        exp: token_expiration
+      }
+    end
 
-      # jtiをUsersテーブルに保存する
-      def remember_jti(user_id)
-        User.find(user_id).remember(payload_jti)
-      end
+    # @payloadのjtiを返す
+    def payload_jti
+      @payload.with_indifferent_access[:jti]
+    end
 
-      ##  デコードメソッド
+    # jtiをUsersテーブルに保存する
+    def remember_jti(user_id)
+      User.find(user_id).remember(payload_jti)
+    end
 
-      # デコード時のjwt_idを検証する(エラーはJWT::DecodeErrorに委託する)
-      def verify_jti?(jti, payload)
-        user_id = get_user_id_from(payload) # 暗号化subを取り出す
-        decode_user = entity_for_user(user_id) # 復号 => User取得
-        decode_user.refresh_jti == jti # DBに記録のJTIと一致するか
-      rescue UserAuth.not_found_exception_class
-        false
-      end
+    ##  デコードメソッド
 
-      # デコード時のデフォルトオプション
-      # Doc: https://github.com/jwt/ruby-jwt
-      def verify_claims
-        {
-          verify_expiration: true,           # 有効期限の検証
-          verify_jti: proc { |jti, payload|  # jtiとセッションIDの検証
-            verify_jti?(jti, payload)
-          },
-          algorithm: algorithm
-        }
-      end
+    # デコード時のjwt_idを検証する(エラーはJWT::DecodeErrorに委託する)
+    def verify_jti?(jti, payload)
+      user_id = get_user_id_from(payload) # 暗号化subを取り出す
+      decode_user = entity_for_user(user_id) # 復号 => User取得
+      decode_user.refresh_jti == jti # DBに記録のJTIと一致するか
+    rescue UserAuth.not_found_exception_class
+      false
+    end
+
+    # デコード時のデフォルトオプション
+    # Doc: https://github.com/jwt/ruby-jwt
+    def verify_claims
+      {
+        verify_expiration: true,           # 有効期限の検証
+        verify_jti: proc { |jti, payload|  # jtiとセッションIDの検証
+          verify_jti?(jti, payload)
+        },
+        algorithm: algorithm
+      }
+    end
   end
 end

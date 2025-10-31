@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 class AccessTokenTest < ActionDispatch::IntegrationTest
@@ -6,7 +8,7 @@ class AccessTokenTest < ActionDispatch::IntegrationTest
       name: "Test User",
       email: "test@example.com",
       password: "password",
-      activated: true   # active_user が想定していたフラグに合わせる
+      activated: true # active_user が想定していたフラグに合わせる
     )
     @encode   = UserAuth::AccessToken.new(user_id: @user.id)
     @lifetime = UserAuth.access_token_lifetime
@@ -69,7 +71,7 @@ class AccessTokenTest < ActionDispatch::IntegrationTest
   # トークンのデコードが正しく動作することを検証
   test "decode_token" do
     decode = UserAuth::AccessToken.new(token: @encode.token)
-    payload = decode.payload
+    decode.payload
     # デコードユーザーは一致しているか
     token_user = decode.entity_for_user
     assert_equal @user, token_user
@@ -79,7 +81,7 @@ class AccessTokenTest < ActionDispatch::IntegrationTest
     assert_equal UserAuth.token_issuer, verify_claims[:iss]
     assert_equal UserAuth.token_audience, verify_claims[:aud]
     assert_equal UserAuth.token_signature_algorithm,
-           verify_claims[:algorithm]
+                 verify_claims[:algorithm]
     assert verify_claims[:verify_expiration]
     assert verify_claims[:verify_iss]
     assert verify_claims[:verify_aud]
@@ -87,19 +89,19 @@ class AccessTokenTest < ActionDispatch::IntegrationTest
     assert_not verify_claims[:verify_sub]
 
     # 有効期限内はエラーを吐いていないか
-    travel_to (@lifetime.from_now - 1.second) do
+    travel_to(@lifetime.from_now - 1.second) do
       assert UserAuth::AccessToken.new(token: @encode.token)
     end
 
     # 有効期限後トークンはエラーを吐いているか
-    travel_to (@lifetime.from_now) do
+    travel_to(@lifetime.from_now) do
       assert_raises JWT::ExpiredSignature do
         UserAuth::AccessToken.new(token: @encode.token)
       end
     end
 
     # トークンが書き換えられた場合エラーを吐いているか
-    invalid_token = @encode.token + "a"
+    invalid_token = "#{@encode.token}a"
     assert_raises JWT::VerificationError do
       UserAuth::AccessToken.new(token: invalid_token)
     end

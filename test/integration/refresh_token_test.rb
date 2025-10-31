@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 class RefreshTokenTest < ActionDispatch::IntegrationTest
@@ -34,7 +36,7 @@ class RefreshTokenTest < ActionDispatch::IntegrationTest
   # リフレッシュトークンのデコードが正しく動作することを検証
   test "decode_token" do
     decode = UserAuth::RefreshToken.new(token: @encode.token)
-    payload = decode.payload
+    decode.payload
 
     # デコードユーザーは一致しているか
     token_user = decode.entity_for_user
@@ -47,14 +49,14 @@ class RefreshTokenTest < ActionDispatch::IntegrationTest
                  verify_claims[:algorithm]
 
     # 有効期限後トークンはエラーを吐いているか
-    travel_to (@lifetime.from_now) do
+    travel_to(@lifetime.from_now) do
       assert_raises JWT::ExpiredSignature do
         UserAuth::RefreshToken.new(token: @encode.token)
       end
     end
 
     # トークンが書き換えられた場合エラーを吐いているか
-    invalid_token = @encode.token + "a"
+    invalid_token = "#{@encode.token}a"
     assert_raises JWT::VerificationError do
       UserAuth::RefreshToken.new(token: invalid_token)
     end

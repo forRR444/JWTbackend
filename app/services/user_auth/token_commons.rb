@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module UserAuth
   module TokenCommons
     # エンコードキー
@@ -36,12 +38,14 @@ module UserAuth
     # user_id暗号化
     def encrypt_for(user_id)
       return unless user_id
+
       crypt.encrypt_and_sign(user_id.to_s, purpose: :authorization)
     end
 
     # user_id複合化(複合エラーの場合はnilを返す)
     def decrypt_for(user_id)
       return unless user_id
+
       crypt.decrypt_and_verify(user_id.to_s, purpose: :authorization)
     rescue ActiveSupport::MessageEncryptor::InvalidMessage, ActiveSupport::MessageVerifier::InvalidSignature
       nil

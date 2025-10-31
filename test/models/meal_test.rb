@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 class MealTest < ActiveSupport::TestCase
@@ -24,7 +26,7 @@ class MealTest < ActiveSupport::TestCase
     end
 
     # 不正なmeal_typeは保存できない
-    invalid_types = [ "invalid", "brunch", "teatime" ]
+    invalid_types = %w[invalid brunch teatime]
     invalid_types.each do |type|
       meal = @user.meals.new(meal_type: type, content: "test", eaten_on: Date.today)
       assert_not meal.valid?, "#{type} should be invalid"
@@ -68,44 +70,44 @@ class MealTest < ActiveSupport::TestCase
   # タグのgetterとsetterが正しく動作することを検証
   test "tags getter and setter" do
     # tagsの設定（配列）
-    @meal.tags = [ "healthy", "quick", "protein" ]
+    @meal.tags = %w[healthy quick protein]
     @meal.save!
 
     # tags_textとして保存されている
     assert_equal "healthy,quick,protein", @meal.tags_text
 
     # tagsとして配列で取得できる
-    assert_equal [ "healthy", "quick", "protein" ], @meal.tags
+    assert_equal %w[healthy quick protein], @meal.tags
   end
 
   # 空の値を含むタグが除外されることを検証
   test "tags with empty values" do
     # 空の値は除外される
-    @meal.tags = [ "healthy", "", " ", "quick" ]
+    @meal.tags = ["healthy", "", " ", "quick"]
     @meal.save!
 
     assert_equal "healthy,quick", @meal.tags_text
-    assert_equal [ "healthy", "quick" ], @meal.tags
+    assert_equal %w[healthy quick], @meal.tags
   end
 
   # 重複したタグが除外されることを検証
   test "tags with duplicates" do
     # 重複は除外される
-    @meal.tags = [ "healthy", "healthy", "quick" ]
+    @meal.tags = %w[healthy healthy quick]
     @meal.save!
 
     assert_equal "healthy,quick", @meal.tags_text
-    assert_equal [ "healthy", "quick" ], @meal.tags
+    assert_equal %w[healthy quick], @meal.tags
   end
 
   # 空白を含むタグがトリムされることを検証
   test "tags with whitespace" do
     # 空白はトリムされる
-    @meal.tags = [ " healthy ", "quick  ", "  protein" ]
+    @meal.tags = [" healthy ", "quick  ", "  protein"]
     @meal.save!
 
     assert_equal "healthy,quick,protein", @meal.tags_text
-    assert_equal [ "healthy", "quick", "protein" ], @meal.tags
+    assert_equal %w[healthy quick protein], @meal.tags
   end
 
   # tags_textがnilの場合に空配列が返されることを検証
@@ -236,7 +238,7 @@ class MealTest < ActiveSupport::TestCase
       fat: 10,
       carbohydrate: 45
     )
-    meal.tags = [ "healthy", "homemade" ]
+    meal.tags = %w[healthy homemade]
     meal.save!
     meal.reload
 
@@ -252,7 +254,7 @@ class MealTest < ActiveSupport::TestCase
     assert_equal "10.0", json["fat"].to_s
     assert_equal "45.0", json["carbohydrate"].to_s
     assert_equal meal.eaten_on.to_s, json["eaten_on"].to_s
-    assert_equal [ "healthy", "homemade" ], json[:tags]
+    assert_equal %w[healthy homemade], json[:tags]
 
     # created_at, updated_atも含まれる
     assert json.key?("created_at")

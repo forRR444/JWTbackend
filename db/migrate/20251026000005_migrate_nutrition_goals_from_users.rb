@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MigrateNutritionGoalsFromUsers < ActiveRecord::Migration[8.0]
   def up
     # 既存のusersテーブルの目標データをnutrition_goalsに移行

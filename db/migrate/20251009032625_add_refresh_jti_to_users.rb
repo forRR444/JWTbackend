@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddRefreshJtiToUsers < ActiveRecord::Migration[8.0]
   def change
     add_column :users, :refresh_jti, :string

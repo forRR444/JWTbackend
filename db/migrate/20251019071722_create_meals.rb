@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateMeals < ActiveRecord::Migration[8.0]
   def change
     create_table :meals do |t|
@@ -11,6 +13,6 @@ class CreateMeals < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :meals, [ :user_id, :created_at ]
+    add_index :meals, %i[user_id created_at]
   end
 end

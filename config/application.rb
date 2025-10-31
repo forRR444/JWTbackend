@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "boot"
 
 require "rails/all"
@@ -12,8 +14,7 @@ module Backend
     config.load_defaults 8.0
     # I18n設定(エラーメッセージの日本語化をデフォルトにする)
     config.i18n.default_locale = :ja
-    config.i18n.available_locales = [ :en, :ja ]
-
+    config.i18n.available_locales = %i[en ja]
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
@@ -24,8 +25,10 @@ module Backend
     config.middleware.use ActionDispatch::Cookies
 
     # Cookieのsamesite属性を変更する(開発環境でnoneを使用するとCookieの共有ができない)
-    config.action_dispatch.cookies_same_site_protection =
-    ENV["COOKIES_SAME_SITE"].to_sym if Rails.env.production?
+    if Rails.env.production?
+      config.action_dispatch.cookies_same_site_protection =
+        ENV["COOKIES_SAME_SITE"].to_sym
+    end
 
     # Configuration for the application, engines, and railties goes here.
     #

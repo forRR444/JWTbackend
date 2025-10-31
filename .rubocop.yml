@@ -1,8 +1,74 @@
-# Omakase Ruby styling for Rails
-inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+AllCops:
+  TargetRubyVersion: 3.2
+  NewCops: enable
+  SuggestExtensions: false
 
-# Overwrite or add rules to create your own house style
-#
-# # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
-# Layout/SpaceInsideArrayLiteralBrackets:
-#   Enabled: false
+  # すべてのファイルを対象（除外設定なし）
+  Exclude:
+    - "db/schema.rb"
+    - "bin/**/*"
+    - "vendor/**/*"
+    - "node_modules/**/*"
+
+  # Rubocopが無視しがちなフォルダも含める
+  Include:
+    - "**/*.rb"
+
+# 自動修正時の設定
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Layout/SpaceInsideArrayLiteralBrackets:
+  EnforcedStyle: no_space
+
+# テストファイルに対する制約を緩和
+Metrics/ClassLength:
+  Exclude:
+    - "test/**/*"
+
+Metrics/BlockLength:
+  Exclude:
+    - "test/**/*"
+    - "config/**/*"
+    - "db/**/*"
+
+Metrics/MethodLength:
+  Max: 20
+  Exclude:
+    - "test/**/*"
+    - "db/migrate/**/*"
+
+Metrics/AbcSize:
+  Max: 25
+  Exclude:
+    - "test/**/*"
+    - "db/migrate/**/*"
+
+Metrics/CyclomaticComplexity:
+  Exclude:
+    - "db/migrate/**/*"
+
+Metrics/PerceivedComplexity:
+  Exclude:
+    - "db/migrate/**/*"
+
+# 命名規則の緩和
+Naming/VariableNumber:
+  Enabled: false
+
+Naming/AccessorMethodName:
+  Enabled: false
+
+Naming/PredicatePrefix:
+  Enabled: false
+
+Naming/FileName:
+  Enabled: false
+
+# Lintの調整
+Lint/UnderscorePrefixedVariableName:
+  Enabled: false
+
+# ドキュメント要件を緩和
+Style/Documentation:
+  Enabled: false

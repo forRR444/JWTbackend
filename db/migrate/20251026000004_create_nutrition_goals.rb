@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateNutritionGoals < ActiveRecord::Migration[8.0]
   def change
     create_table :nutrition_goals do |t|
@@ -11,7 +13,7 @@ class CreateNutritionGoals < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :nutrition_goals, [ :user_id, :start_date ]
-    add_index :nutrition_goals, [ :user_id, :end_date ]
+    add_index :nutrition_goals, %i[user_id start_date]
+    add_index :nutrition_goals, %i[user_id end_date]
   end
 end

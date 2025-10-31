@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 require "email_validator"
 
 class User < ApplicationRecord
   # トークン生成機能（JWT関連）を追加
   include TokenGenerateService
+
   # バリデーション前にメールアドレスを小文字化
   before_validation :downcase_email
   # パスワード暗号化(gem bcrypt)
@@ -29,7 +32,7 @@ class User < ApplicationRecord
                     uniqueness: { case_sensitive: false }
 
   # パスワード：英数字・ハイフン・アンダースコアのみ、8文字以上
-  VALID_PASSWORD_REGEX = /\A[\w\-]+\z/
+  VALID_PASSWORD_REGEX = /\A[\w-]+\z/
   validates :password, presence: true, # 空白・空文字列を許可しない
                        length: { minimum: 8,
                                  allow_blank: true },
@@ -72,7 +75,7 @@ class User < ApplicationRecord
   # レスポンス用JSON(id・名前・目標栄養素)を生成
   def response_json(payload = {})
     goal = current_goal
-    base_json = as_json(only: [ :id, :name ])
+    base_json = as_json(only: %i[id name])
 
     # 現在の目標値を追加（目標がない場合はnull）
     base_json.merge!(
@@ -86,8 +89,9 @@ class User < ApplicationRecord
   end
 
   private
-    # email小文字化
-    def downcase_email
-      self.email.downcase! if email
-    end
+
+  # email小文字化
+  def downcase_email
+    email&.downcase!
+  end
 end

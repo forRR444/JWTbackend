@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 class AuthenticationTest < ActionDispatch::IntegrationTest
@@ -26,7 +28,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert response.body.present?
 
     # 有効期限切れは401が返っているか
-    travel_to (@access_lifetime.from_now) do
+    travel_to(@access_lifetime.from_now) do
       # アクセス前のcookieは存在するか
       assert_not cookies[@session_key].blank?
 
@@ -40,7 +42,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     end
 
     # 不正なtokenが投げられた場合
-    invalid_token = "a." + access_token
+    invalid_token = "a.#{access_token}"
     me_api(invalid_token)
 
     assert_response 401
