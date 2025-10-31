@@ -2,7 +2,7 @@ namespace :db do
   namespace :seed do
     desc "Import food composition data from SQL dump (for production setup)"
     task foods: :environment do
-      sql_file = Rails.root.join('db', 'foods_data.sql')
+      sql_file = Rails.root.join("db", "foods_data.sql")
 
       unless File.exist?(sql_file)
         puts "ERROR: SQL dump file not found at #{sql_file}"
@@ -24,17 +24,17 @@ namespace :db do
       db_config = ActiveRecord::Base.connection_db_config.configuration_hash
 
       command = [
-        'psql',
-        '-h', db_config[:host] || 'localhost',
-        '-U', db_config[:username] || ENV['USER'],
-        '-d', db_config[:database],
-        '-f', sql_file.to_s,
-        '-q' # Quiet mode
+        "psql",
+        "-h", db_config[:host] || "localhost",
+        "-U", db_config[:username] || ENV["USER"],
+        "-d", db_config[:database],
+        "-f", sql_file.to_s,
+        "-q" # Quiet mode
       ]
 
       # パスワードが必要な場合は環境変数で設定
       env = {}
-      env['PGPASSWORD'] = db_config[:password] if db_config[:password]
+      env["PGPASSWORD"] = db_config[:password] if db_config[:password]
 
       puts "\nExecuting: #{command.join(' ')}"
       puts "(This may take 10-20 seconds...)\n"
@@ -56,5 +56,5 @@ end
 
 namespace :food_data do
   desc "Import food data from SQL dump (alias for db:seed:foods)"
-  task :import_sql => 'db:seed:foods'
+  task import_sql: "db:seed:foods"
 end
