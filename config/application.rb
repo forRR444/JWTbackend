@@ -12,7 +12,7 @@ module Backend
     config.load_defaults 8.0
     # I18n設定(エラーメッセージの日本語化をデフォルトにする)
     config.i18n.default_locale = :ja
-    config.i18n.available_locales = [:en, :ja]
+    config.i18n.available_locales = [ :en, :ja ]
 
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do

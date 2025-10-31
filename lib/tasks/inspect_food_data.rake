@@ -1,9 +1,9 @@
-require 'roo'
+require "roo"
 
 namespace :food_data do
   desc "Inspect the structure of the food composition Excel file"
   task inspect: :environment do
-    file_path = Rails.root.join('20201225-mxt_kagsei-mext_01110_012.xlsx').to_s
+    file_path = Rails.root.join("20201225-mxt_kagsei-mext_01110_012.xlsx").to_s
 
     puts "Opening Excel file: #{file_path}"
     xlsx = Roo::Spreadsheet.open(file_path)
@@ -20,7 +20,7 @@ namespace :food_data do
     puts "Columns: #{first_sheet.last_column}"
 
     puts "\n=== First 10 rows of first sheet ==="
-    (1...[first_sheet.last_row, 10].min).each do |row_num|
+    (1...[ first_sheet.last_row, 10 ].min).each do |row_num|
       row_data = first_sheet.row(row_num)
       puts "Row #{row_num}: #{row_data.first(10).inspect}"
     end
@@ -29,7 +29,7 @@ namespace :food_data do
     puts "\n=== Looking for header row ==="
     (1..20).each do |row_num|
       row_data = first_sheet.row(row_num)
-      if row_data.any? { |cell| cell.to_s.include?('食品番号') || cell.to_s.include?('エネルギー') }
+      if row_data.any? { |cell| cell.to_s.include?("食品番号") || cell.to_s.include?("エネルギー") }
         puts "Potential header at row #{row_num}: #{row_data.first(15).inspect}"
       end
     end

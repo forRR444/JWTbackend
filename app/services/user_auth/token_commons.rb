@@ -1,6 +1,5 @@
 module UserAuth
   module TokenCommons
-
     # エンコードキー
     def secret_key
       UserAuth.token_secret_signature_key

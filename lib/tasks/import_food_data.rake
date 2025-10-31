@@ -1,9 +1,9 @@
-require 'roo'
+require "roo"
 
 namespace :food_data do
   desc "Import food composition data from Excel file"
   task import: :environment do
-    file_path = Rails.root.join('20201225-mxt_kagsei-mext_01110_012.xlsx').to_s
+    file_path = Rails.root.join("20201225-mxt_kagsei-mext_01110_012.xlsx").to_s
 
     puts "Opening Excel file: #{file_path}"
     xlsx = Roo::Spreadsheet.open(file_path)
@@ -95,11 +95,11 @@ namespace :food_data do
     value_str = value.to_s.strip
 
     # 空文字、"-"、"Tr"（微量）は除外
-    return nil if value_str.empty? || value_str == '-' || value_str.downcase == 'tr'
+    return nil if value_str.empty? || value_str == "-" || value_str.downcase == "tr"
 
     # 括弧を除去（推定値も取り込む）
     # "(0.3)" -> "0.3"
-    value_str = value_str.gsub(/[()]/, '')
+    value_str = value_str.gsub(/[()]/, "")
 
     # 数値に変換
     begin

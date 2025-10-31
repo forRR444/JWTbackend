@@ -11,7 +11,7 @@ class CreateNutritionGoals < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :nutrition_goals, [:user_id, :start_date]
-    add_index :nutrition_goals, [:user_id, :end_date]
+    add_index :nutrition_goals, [ :user_id, :start_date ]
+    add_index :nutrition_goals, [ :user_id, :end_date ]
   end
 end

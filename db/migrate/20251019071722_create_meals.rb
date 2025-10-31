@@ -3,7 +3,7 @@ class CreateMeals < ActiveRecord::Migration[8.0]
     create_table :meals do |t|
       t.references :user, null: false, foreign_key: true
       t.string :meal_type, null: false, default: "other"
-      t.text :content, null: false 
+      t.text :content, null: false
       t.integer :calories
       t.integer :grams
       t.string :tags_text
@@ -11,6 +11,6 @@ class CreateMeals < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :meals, [:user_id, :created_at]
+    add_index :meals, [ :user_id, :created_at ]
   end
 end
