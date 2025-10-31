@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 source "https://rubygems.org"
 
-gem "rails", "~> 8.0.2", ">= 8.0.2.1"
-gem "pg", "~> 1.1"
-gem "puma", ">= 5.0"
-gem "solid_cache"
-gem "solid_queue"
-gem "solid_cable"
 gem "bootsnap", require: false
 gem "kamal", require: false
+gem "pg", "~> 1.1"
+gem "puma", ">= 5.0"
+gem "rails", "~> 8.0.2", ">= 8.0.2.1"
+gem "solid_cable"
+gem "solid_cache"
+gem "solid_queue"
 gem "thruster", require: false
-gem "tzinfo-data", platforms: %i[ windows jruby ]
+gem "tzinfo-data", platforms: %i[windows jruby]
 
 # JWT認証用Gem
 gem "bcrypt"
@@ -18,15 +20,15 @@ gem "rack-cors"
 gem "jwt", "~> 3.1", ">= 3.1.2"
 
 # Excel読み込み用Gem
-gem "roo", "~> 2.10"
 gem "csv"
+gem "roo", "~> 2.10"
 
 group :development, :test do
-  gem "dotenv-rails"
-  gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
   gem "brakeman", require: false
-  gem "rubocop-rails-omakase", require: false
+  gem "debug", platforms: %i[mri windows], require: "debug/prelude"
+  gem "dotenv-rails"
   gem "rails-erd"
+  gem "rubocop-rails-omakase", require: false
 end
 
 group :test do

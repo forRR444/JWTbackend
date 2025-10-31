@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Tag < ApplicationRecord
   # バリデーション
   validates :name, presence: true, uniqueness: true, length: { maximum: 20 }
@@ -7,7 +9,7 @@ class Tag < ApplicationRecord
   has_many :meals, through: :meal_tags
 
   # スコープ
-  scope :popular, ->(limit = 10) {
+  scope :popular, lambda { |limit = 10|
     joins(:meal_tags)
       .group(:id)
       .order("COUNT(meal_tags.id) DESC")

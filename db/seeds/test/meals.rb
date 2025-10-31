@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # テスト用食事データ
 # ユーザーが存在することが前提
 user1 = User.find_by(email: "test_user0@example.com")
@@ -9,7 +11,7 @@ if user1.nil? || user2.nil?
 end
 
 # 既存のテスト用mealデータを削除（冪等性を保つため）
-Meal.where(user: [ user1, user2 ]).destroy_all
+Meal.where(user: [user1, user2]).destroy_all
 
 meals_data = [
   {
@@ -22,7 +24,7 @@ meals_data = [
     protein: 15.5,
     fat: 12.0,
     carbohydrate: 40.0,
-    tags: [ "healthy", "quick" ]
+    tags: %w[healthy quick]
   },
   {
     user: user1,
@@ -34,7 +36,7 @@ meals_data = [
     protein: 30.0,
     fat: 15.0,
     carbohydrate: 35.0,
-    tags: [ "protein", "salad" ]
+    tags: %w[protein salad]
   },
   {
     user: user1,
@@ -46,7 +48,7 @@ meals_data = [
     protein: 40.0,
     fat: 20.0,
     carbohydrate: 30.0,
-    tags: [ "fish", "healthy" ]
+    tags: %w[fish healthy]
   },
   {
     user: user2,
@@ -58,7 +60,7 @@ meals_data = [
     protein: 8.0,
     fat: 5.0,
     carbohydrate: 45.0,
-    tags: [ "quick" ]
+    tags: ["quick"]
   },
   {
     user: user1,
@@ -70,7 +72,7 @@ meals_data = [
     protein: 5.0,
     fat: 8.0,
     carbohydrate: 20.0,
-    tags: [ "healthy", "snack" ]
+    tags: %w[healthy snack]
   }
 ]
 

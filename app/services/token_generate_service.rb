@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TokenGenerateService
   # include先の初期化処理実行場所(include先のオブジェクト)
   def self.included(base)

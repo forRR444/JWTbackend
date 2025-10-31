@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
@@ -31,8 +33,8 @@ Rails.application.configure do
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
   # Log to STDOUT with the current request id as a default log tag.
-  config.log_tags = [ :request_id ]
-  config.logger   = ActiveSupport::TaggedLogging.logger(STDOUT)
+  config.log_tags = [:request_id]
+  config.logger   = ActiveSupport::TaggedLogging.logger($stdout)
 
   # Change to "debug" to log everything (including potentially personally-identifiable information!)
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
@@ -74,18 +76,16 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   # Only use :id for inspections in production.
-  config.active_record.attributes_for_inspect = [ :id ]
+  config.active_record.attributes_for_inspect = [:id]
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   # 環境変数 APP_HOST で許可するホストを指定
   # 環境変数 APP_DOMAIN でサブドメインのワイルドカードパターンを指定
   if ENV["APP_HOST"].present?
-    allowed_hosts = [ ENV["APP_HOST"] ]
+    allowed_hosts = [ENV["APP_HOST"]]
 
     # APP_DOMAIN が設定されている場合、サブドメインも許可
-    if ENV["APP_DOMAIN"].present?
-      allowed_hosts << /.*\.#{Regexp.escape(ENV["APP_DOMAIN"])}/
-    end
+    allowed_hosts << /.*\.#{Regexp.escape(ENV['APP_DOMAIN'])}/ if ENV["APP_DOMAIN"].present?
 
     config.hosts = allowed_hosts
 

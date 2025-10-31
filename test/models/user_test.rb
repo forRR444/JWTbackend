@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 class UserTest < ActiveSupport::TestCase
@@ -10,7 +12,7 @@ class UserTest < ActiveSupport::TestCase
     # 入力必須
     user = User.new(email: "test@example.com", password: "password")
     user.save
-    required_msg = [ "名前を入力してください" ]
+    required_msg = ["名前を入力してください"]
     assert_equal(required_msg, user.errors.full_messages)
 
     # 文字数30字まで
@@ -18,7 +20,7 @@ class UserTest < ActiveSupport::TestCase
     name = "a" * (max + 1)
     user.name = name
     user.save
-    length_msg = [ "名前は30文字以内で入力してください" ]
+    length_msg = ["名前は30文字以内で入力してください"]
     assert_equal(length_msg, user.errors.full_messages)
 
     # 30字以下で登録成功
@@ -34,17 +36,17 @@ class UserTest < ActiveSupport::TestCase
     # 入力必須
     user = User.new(name: "test", password: "password")
     user.save
-    required_msg = [ "メールアドレスを入力してください" ]
+    required_msg = ["メールアドレスを入力してください"]
     assert_equal(required_msg, user.errors.full_messages)
 
     # 文字数255字まで
     max = 255
     domain = "@example.com"
-    email = "a" * (max - domain.length + 1) + domain
+    email = ("a" * (max - domain.length + 1)) + domain
     assert max < email.length
     user.email = email
     user.save
-    maxlength_msg = [ "メールアドレスは255文字以内で入力してください" ]
+    maxlength_msg = ["メールアドレスは255文字以内で入力してください"]
     assert_equal(maxlength_msg, user.errors.full_messages)
 
     # 正しい書式は保存できているか
@@ -80,7 +82,7 @@ class UserTest < ActiveSupport::TestCase
     ng_emails.each do |email|
       user.email = email
       user.save
-      format_msg = [ "メールアドレスは不正な値です" ]
+      format_msg = ["メールアドレスは不正な値です"]
       assert_equal(format_msg, user.errors.full_messages)
     end
   end
@@ -108,7 +110,7 @@ class UserTest < ActiveSupport::TestCase
     assert_no_difference("User.count") do
       user = User.new(name: "test2", email: email, password: "password")
       user.save
-      uniqueness_msg = [ "メールアドレスはすでに存在します" ]
+      uniqueness_msg = ["メールアドレスはすでに存在します"]
       assert_equal(uniqueness_msg, user.errors.full_messages)
     end
 
@@ -119,7 +121,7 @@ class UserTest < ActiveSupport::TestCase
     assert_no_difference("User.count") do
       user = User.new(name: "test3", email: email, password: "password", activated: true)
       user.save
-      uniqueness_msg = [ "メールアドレスはすでに存在します" ]
+      uniqueness_msg = ["メールアドレスはすでに存在します"]
       assert_equal(uniqueness_msg, user.errors.full_messages)
     end
 
@@ -138,21 +140,21 @@ class UserTest < ActiveSupport::TestCase
     # 入力必須
     user = User.new(name: "test", email: "test@example.com")
     user.save
-    required_msg = [ "パスワードを入力してください" ]
+    required_msg = ["パスワードを入力してください"]
     assert_equal(required_msg, user.errors.full_messages)
 
     # min文字以上
     min = 8
     user.password = "a" * (min - 1)
     user.save
-    minlength_msg = [ "パスワードは8文字以上で入力してください" ]
+    minlength_msg = ["パスワードは8文字以上で入力してください"]
     assert_equal(minlength_msg, user.errors.full_messages)
 
     # max文字以下
     max = 72
     user.password = "a" * (max + 1)
     user.save
-    maxlength_msg = [ "パスワードが長すぎます" ]
+    maxlength_msg = ["パスワードが長すぎます"]
     assert_equal(maxlength_msg, user.errors.full_messages)
 
     # 書式チェック VALID_PASSWORD_REGEX = /\A[\w\-]+\z/
@@ -177,7 +179,7 @@ class UserTest < ActiveSupport::TestCase
       ＡＢＣＤＥＦＧＨ
       password@
     ]
-    format_msg = [ "パスワードは半角英数字•ﾊｲﾌﾝ•ｱﾝﾀﾞｰﾊﾞｰが使えます" ]
+    format_msg = ["パスワードは半角英数字•ﾊｲﾌﾝ•ｱﾝﾀﾞｰﾊﾞｰが使えます"]
     ng_passwords.each do |pass|
       user.password = pass
       user.save

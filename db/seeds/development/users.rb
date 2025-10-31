@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # テストアカウント（フロントエンドのテストログイン用）
 test_user = User.find_or_initialize_by(email: "test@example.com", activated: true)
 if test_user.new_record?
@@ -15,11 +17,11 @@ end
   # オブジェクトが存在しない => 新規作成
   user = User.find_or_initialize_by(email: email, activated: true)
 
-  if user.new_record?
-    user.name = name
-    user.password = "password"
-    user.save!
-  end
+  next unless user.new_record?
+
+  user.name = name
+  user.password = "password"
+  user.save!
 end
 
 puts "Development users = #{User.count}"

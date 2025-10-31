@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # 食事タイプ別グループ化を生成するサービスクラス
 class MealSummaryService
   MEAL_TYPES = %w[breakfast lunch dinner snack other].freeze
@@ -19,29 +21,30 @@ class MealSummaryService
   end
 
   private
-    # フィルタ済み食事データを取得
-    def fetch_meals
-      MealFiltersService.new(@user, @params).call
-    end
 
-    # 日付範囲情報を構築
-    def build_range_info
-      if @params[:date].present?
-        { date: @params[:date] }
-      elsif @params[:from].present? && @params[:to].present?
-        { from: @params[:from], to: @params[:to] }
-      else
-        { date: nil, from: nil, to: nil }
-      end
-    end
+  # フィルタ済み食事データを取得
+  def fetch_meals
+    MealFiltersService.new(@user, @params).call
+  end
 
-    # 食事タイプ別にグループ化
-    # 各食事タイプ（朝食など）ごとに配列で格納
-    def group_by_type(meals)
-      grouped = meals.group_by(&:meal_type)
-
-      MEAL_TYPES.each_with_object({}) do |type, hash|
-        hash[type] = grouped[type] || []
-      end
+  # 日付範囲情報を構築
+  def build_range_info
+    if @params[:date].present?
+      { date: @params[:date] }
+    elsif @params[:from].present? && @params[:to].present?
+      { from: @params[:from], to: @params[:to] }
+    else
+      { date: nil, from: nil, to: nil }
     end
+  end
+
+  # 食事タイプ別にグループ化
+  # 各食事タイプ（朝食など）ごとに配列で格納
+  def group_by_type(meals)
+    grouped = meals.group_by(&:meal_type)
+
+    MEAL_TYPES.each_with_object({}) do |type, hash|
+      hash[type] = grouped[type] || []
+    end
+  end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DropJobsTable < ActiveRecord::Migration[8.0]
   def change
     drop_table :jobs do |t|

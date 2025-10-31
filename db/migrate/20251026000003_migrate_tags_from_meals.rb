@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MigrateTagsFromMeals < ActiveRecord::Migration[8.0]
   def up
     # 既存のmealsテーブルのtags_textからデータを移行
