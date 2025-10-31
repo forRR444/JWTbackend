@@ -1,4 +1,4 @@
-require 'jwt'
+require "jwt"
 
 module UserAuth
   class AccessToken

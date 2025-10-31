@@ -15,7 +15,7 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "bcrypt"
 gem "rack-cors"
 # jwt Doc: https://rubygems.org/gems/jwt
-gem 'jwt', '~> 3.1', '>= 3.1.2'
+gem "jwt", "~> 3.1", ">= 3.1.2"
 
 # Excel読み込み用Gem
 gem "roo", "~> 2.10"
@@ -26,10 +26,10 @@ group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
   gem "brakeman", require: false
   gem "rubocop-rails-omakase", require: false
-  gem 'rails-erd'
+  gem "rails-erd"
 end
 
 group :test do
   # テスト結果を色付けする
-  gem 'minitest-reporters', '~> 1.1', '>= 1.1.11'
+  gem "minitest-reporters", "~> 1.1", ">= 1.1.11"
 end

@@ -4,12 +4,12 @@
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     # 環境変数から許可オリジンを取得（未設定時はlocalhost:5173をデフォルト）
-    allowed_origins = ENV.fetch('ALLOWED_ORIGINS', 'http://localhost:5173').split(',').map(&:strip)
+    allowed_origins = ENV.fetch("ALLOWED_ORIGINS", "http://localhost:5173").split(",").map(&:strip)
     origins allowed_origins
 
-    resource '/api/*',
+    resource "/api/*",
       headers: %w[Content-Type Authorization X-Requested-With], # 必要なヘッダーのみ許可
-      expose: [ 'Authorization' ], # レスポンスヘッダーにAuthorizationを含める
+      expose: [ "Authorization" ], # レスポンスヘッダーにAuthorizationを含める
       methods: [ :get, :post, :put, :patch, :delete, :options, :head ],
       credentials: true # Cookieを許可
   end
