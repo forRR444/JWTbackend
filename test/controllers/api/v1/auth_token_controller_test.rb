@@ -28,6 +28,7 @@ class Api::V1::AuthTokenControllerTest < ActionDispatch::IntegrationTest
   end
 
   # 有効なログイン
+  # 正しい認証情報でログインできることを検証
   test "valid_login_from_create_action" do
     login(@params)
     assert_response 200
@@ -89,6 +90,7 @@ class Api::V1::AuthTokenControllerTest < ActionDispatch::IntegrationTest
   end
 
   # 無効なログイン
+  # 不正な認証情報でログインが拒否されることを検証
   test "invalid_login_from_create_action" do
     # 不正なユーザーの場合
     pass = "password"
@@ -109,6 +111,7 @@ class Api::V1::AuthTokenControllerTest < ActionDispatch::IntegrationTest
   end
 
   # 有効なリフレッシュ
+  # トークンリフレッシュが正しく動作することを検証
   test "valid_refresh_from_refresh_action" do
     # 有効なログイン
     login(@params)
@@ -147,6 +150,7 @@ class Api::V1::AuthTokenControllerTest < ActionDispatch::IntegrationTest
   end
 
   # 無効なリフレッシュ
+  # 無効なトークンでリフレッシュが拒否されることを検証
   test "invalid_refresh_from_refresh_action" do
     # refresh_tokenが存在しない場合はアクセスできないか
     refresh_api
@@ -186,6 +190,7 @@ class Api::V1::AuthTokenControllerTest < ActionDispatch::IntegrationTest
   end
 
   # ログアウト
+  # ログアウトが正しく動作することを検証
   test "destroy_action" do
     # 有効なログイン
     login(@params)

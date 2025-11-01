@@ -9,6 +9,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   # POST /api/v1/users - 新規ユーザー登録のテスト
+  # 新規ユーザーが正しく登録できることを検証
   test "create registers a new user successfully" do
     user_params = {
       user: {
@@ -43,6 +44,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_not_nil cookies[@session_key]
   end
 
+  # 名前の必須検証を確認
   test "create validates name presence" do
     user_params = {
       user: {
@@ -64,6 +66,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_match(/名前/, json["error"])
   end
 
+  # 名前の長さ制限を検証
   test "create validates name length" do
     user_params = {
       user: {
@@ -84,6 +87,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_match(/名前/, json["error"])
   end
 
+  # メールアドレスの必須検証を確認
   test "create validates email presence" do
     user_params = {
       user: {
@@ -104,6 +108,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_match(/メールアドレス/, json["error"])
   end
 
+  # メールアドレスの形式を検証
   test "create validates email format" do
     invalid_emails = [ "invalid", "test@", "@example.com", "test@.com" ]
 
@@ -125,6 +130,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # アクティブユーザーのメールアドレス一意性を検証
   test "create validates email uniqueness for active users" do
     # 既存のアクティブユーザーと同じメールアドレス
     user_params = {
@@ -146,6 +152,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_match(/メールアドレス/, json["error"])
   end
 
+  # パスワードの必須検証を確認
   test "create validates password presence" do
     user_params = {
       user: {
@@ -166,6 +173,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_match(/パスワード/, json["error"])
   end
 
+  # パスワードの最小文字数を検証
   test "create validates password minimum length" do
     user_params = {
       user: {
@@ -186,6 +194,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_match(/パスワード/, json["error"])
   end
 
+  # パスワードの形式を検証
   test "create validates password format" do
     invalid_passwords = [ "pass word", "pass@word", "パスワード123" ]
 
@@ -207,6 +216,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # パスワード確認の一致を検証
   test "create validates password confirmation match" do
     user_params = {
       user: {
@@ -227,6 +237,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_match(/パスワード/, json["error"])
   end
 
+  # メールアドレスが小文字化されることを検証
   test "create downcases email" do
     user_params = {
       user: {
@@ -245,6 +256,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "uppercase@example.com", new_user.email
   end
 
+  # 正しい有効期限のアクセストークンが発行されることを検証
   test "create issues access token with correct expiration" do
     user_params = {
       user: {
@@ -266,6 +278,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert json["expires"] > Time.current.to_i
   end
 
+  # XHRリクエストが必要であることを検証
   test "create requires xhr request" do
     user_params = {
       user: {
@@ -282,6 +295,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   # GET /api/v1/me - 現在のユーザー情報取得
+  # 現在のユーザー情報が取得できることを検証
   test "me returns current user information" do
     get api("/me"), xhr: true, headers: @headers
     assert_response :ok
@@ -295,11 +309,13 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert json.key?("target_carbohydrate")
   end
 
+  # 認証が必要であることを検証
   test "me requires authentication" do
     get api("/me"), xhr: true
     assert_response :unauthorized
   end
 
+  # 機密情報が公開されないことを検証
   test "me does not expose sensitive information" do
     get api("/me"), xhr: true, headers: @headers
     assert_response :ok
@@ -313,6 +329,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_not json.key?("activated")
   end
 
+  # 有効期限切れトークンで401を返すことを検証
   test "me returns 401 for expired token" do
     # トークンの有効期限を過ぎた状態をシミュレート
     travel_to(UserAuth.access_token_lifetime.from_now + 1.second) do
@@ -321,6 +338,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # 無効なトークンで401を返すことを検証
   test "me returns 401 for invalid token" do
     invalid_headers = auth("invalid.token.here")
     get api("/me"), xhr: true, headers: invalid_headers
@@ -328,6 +346,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   # PUT /api/v1/users/goals - 栄養目標の更新
+  # ユーザーの栄養目標が更新できることを検証
   test "update_goals updates user nutrition goals" do
     goal_params = {
       user: {
@@ -355,6 +374,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_equal 250, @user.target_carbohydrate.to_i
   end
 
+  # 部分的な目標更新ができることを検証
   test "update_goals can update partial goals" do
     # カロリーだけを更新
     goal_params = {
@@ -370,6 +390,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1800, json["target_calories"]
   end
 
+  # nil値を受け入れることを検証
   test "update_goals accepts nil values" do
     # 目標値をクリア
     goal_params = {
@@ -391,6 +412,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_nil @user.target_carbohydrate
   end
 
+  # 小数値を受け入れることを検証
   test "update_goals accepts decimal values" do
     goal_params = {
       user: {
@@ -409,6 +431,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "250.8", json["target_carbohydrate"].to_s
   end
 
+  # 認証が必要であることを検証
   test "update_goals requires authentication" do
     goal_params = {
       user: {
@@ -423,6 +446,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     # (変更なしを確認するため、何もアサートしない)
   end
 
+  # 他のフィールドの更新を許可しないことを検証
   test "update_goals does not allow updating other fields" do
     # nameやemailなどの更新を試みる
     malicious_params = {
@@ -450,6 +474,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_equal 2000, @user.target_calories
   end
 
+  # 有効期限切れトークンで401を返すことを検証
   test "update_goals returns 401 for expired token" do
     goal_params = {
       user: {
@@ -463,6 +488,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # XHRリクエストが必要であることを検証
   test "update_goals requires xhr request" do
     goal_params = {
       user: {
@@ -474,6 +500,7 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
+  # 更新されたユーザーデータが返されることを検証
   test "update_goals returns updated user data" do
     @user.update!(
       target_calories: 1500,

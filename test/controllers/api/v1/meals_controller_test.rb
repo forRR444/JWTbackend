@@ -18,7 +18,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     )
   end
 
-  # GET /api/v1/meals
+  # ユーザーの食事一覧が取得できることを検証
   test "index returns user's meals" do
     get api("/meals"), xhr: true, headers: @headers
     assert_response :success
@@ -33,11 +33,13 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Toast and eggs", meal_json["content"]
   end
 
+  # 認証が必要であることを検証
   test "index requires authentication" do
     get api("/meals"), xhr: true
     assert_response :unauthorized
   end
 
+  # 日付フィルタが正しく動作することを検証
   test "index with date filter" do
     yesterday_meal = @user.meals.create!(
       meal_type: "dinner",
@@ -54,6 +56,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes meal_ids, yesterday_meal.id
   end
 
+  # 日付範囲フィルタが正しく動作することを検証
   test "index with date range filter" do
     old_meal = @user.meals.create!(
       meal_type: "breakfast",
@@ -73,6 +76,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes meal_ids, old_meal.id
   end
 
+  # 現在のユーザーの食事のみ返すことを検証
   test "index only returns current user's meals" do
     other_user = User.create!(
       name: "Other User",
@@ -96,6 +100,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
   end
 
   # GET /api/v1/meals/:id
+  # 食事の詳細が取得できることを検証
   test "show returns meal details" do
     get api("/meals/#{@meal.id}"), xhr: true, headers: @headers
     assert_response :success
@@ -108,16 +113,19 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ "healthy", "quick" ], json["tags"]
   end
 
+  # 認証が必要であることを検証
   test "show requires authentication" do
     get api("/meals/#{@meal.id}"), xhr: true
     assert_response :unauthorized
   end
 
+  # 存在しない食事に対して404を返すことを検証
   test "show returns not found for non-existent meal" do
     get api("/meals/999999"), xhr: true, headers: @headers
     assert_response :not_found
   end
 
+  # 他のユーザーの食事に対して404を返すことを検証
   test "show returns not found for other user's meal" do
     other_user = User.create!(
       name: "Other User",
@@ -136,6 +144,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
   end
 
   # POST /api/v1/meals
+  # 新しい食事が作成できることを検証
   test "create creates a new meal" do
     meal_params = {
       meal: {
@@ -164,6 +173,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ "protein", "salad" ], json[:tags]
   end
 
+  # 認証が必要であることを検証
   test "create requires authentication" do
     meal_params = {
       meal: {
@@ -177,6 +187,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
   end
 
+  # meal_typeのバリデーションを検証
   test "create validates meal_type" do
     meal_params = {
       meal: {
@@ -195,6 +206,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert json.key?("errors")
   end
 
+  # contentの必須検証を確認
   test "create validates content presence" do
     meal_params = {
       meal: {
@@ -211,6 +223,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  # eaten_onの必須検証を確認
   test "create validates eaten_on presence" do
     meal_params = {
       meal: {
@@ -227,6 +240,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  # 最小限のパラメータで作成できることを検証
   test "create with minimal params" do
     meal_params = {
       meal: {
@@ -249,6 +263,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
   end
 
   # PATCH /api/v1/meals/:id
+  # 食事が更新できることを検証
   test "update updates meal" do
     update_params = {
       meal: {
@@ -269,6 +284,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 500, @meal.calories
   end
 
+  # 認証が必要であることを検証
   test "update requires authentication" do
     update_params = {
       meal: {
@@ -280,6 +296,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
   end
 
+  # 存在しない食事に対して404を返すことを検証
   test "update returns not found for non-existent meal" do
     update_params = {
       meal: {
@@ -291,6 +308,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  # 他のユーザーの食事に対して404を返すことを検証
   test "update returns not found for other user's meal" do
     other_user = User.create!(
       name: "Other User",
@@ -317,6 +335,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Salad", other_meal.content
   end
 
+  # meal_typeのバリデーションを検証
   test "update validates meal_type" do
     update_params = {
       meal: {
@@ -328,6 +347,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  # タグの変更ができることを検証
   test "update can change tags" do
     update_params = {
       meal: {
@@ -343,6 +363,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
   end
 
   # DELETE /api/v1/meals/:id
+  # 食事が削除できることを検証
   test "destroy deletes meal" do
     assert_difference("@user.meals.count", -1) do
       delete api("/meals/#{@meal.id}"), xhr: true, headers: @headers
@@ -352,6 +373,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert_nil Meal.find_by(id: @meal.id)
   end
 
+  # 認証が必要であることを検証
   test "destroy requires authentication" do
     delete api("/meals/#{@meal.id}"), xhr: true
     assert_response :unauthorized
@@ -359,11 +381,13 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert_not_nil Meal.find_by(id: @meal.id)
   end
 
+  # 存在しない食事に対して404を返すことを検証
   test "destroy returns not found for non-existent meal" do
     delete api("/meals/999999"), xhr: true, headers: @headers
     assert_response :not_found
   end
 
+  # 他のユーザーの食事に対して404を返すことを検証
   test "destroy returns not found for other user's meal" do
     other_user = User.create!(
       name: "Other User",
@@ -384,6 +408,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
   end
 
   # GET /api/v1/meals/summary
+  # 食事タイプ別のサマリーが取得できることを検証
   test "summary returns meals grouped by type" do
     @user.meals.create!(
       meal_type: "lunch",
@@ -415,11 +440,13 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert groups["dinner"].length >= 1
   end
 
+  # 認証が必要であることを検証
   test "summary requires authentication" do
     get api("/meals/summary"), xhr: true
     assert_response :unauthorized
   end
 
+  # 日付範囲指定でサマリーが取得できることを検証
   test "summary with date range" do
     get api("/meals/summary?from=#{Date.yesterday}&to=#{Date.today}"), xhr: true, headers: @headers
     assert_response :success
@@ -430,6 +457,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
   end
 
   # GET /api/v1/meals/calendar
+  # 月別の食事カウントが取得できることを検証
   test "calendar returns monthly meal counts" do
     month = Date.today.strftime("%Y-%m")
 
@@ -453,12 +481,14 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # 認証が必要であることを検証
   test "calendar requires authentication" do
     month = Date.today.strftime("%Y-%m")
     get api("/meals/calendar?month=#{month}"), xhr: true
     assert_response :unauthorized
   end
 
+  # monthパラメータが必須であることを検証
   test "calendar requires month parameter" do
     get api("/meals/calendar"), xhr: true, headers: @headers
     assert_response :bad_request
@@ -467,11 +497,13 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert json.key?("error")
   end
 
+  # monthパラメータの形式を検証
   test "calendar validates month format" do
     get api("/meals/calendar?month=invalid"), xhr: true, headers: @headers
     assert_response :bad_request
   end
 
+  # monthパラメータの範囲を検証
   test "calendar validates month range" do
     get api("/meals/calendar?month=2025-13"), xhr: true, headers: @headers
     assert_response :bad_request
@@ -480,6 +512,7 @@ class Api::V1::MealsControllerTest < ActionDispatch::IntegrationTest
     assert_response :bad_request
   end
 
+  # 食事のない月で空のデータが返されることを検証
   test "calendar returns empty for month without meals" do
     future_month = (Date.today >> 6).strftime("%Y-%m")
 
