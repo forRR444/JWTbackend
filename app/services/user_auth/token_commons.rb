@@ -47,7 +47,7 @@ module UserAuth
     def decrypt_for(user_id)
       return unless user_id
       crypt.decrypt_and_verify(user_id.to_s, purpose: :authorization)
-    rescue
+    rescue ActiveSupport::MessageEncryptor::InvalidMessage, ActiveSupport::MessageVerifier::InvalidSignature
       nil
     end
 
