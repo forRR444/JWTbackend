@@ -2,7 +2,7 @@ class Api::V1::UsersController < ApplicationController
   include TokenCookieHandler
 
   # JWTトークンの持ち主かどうかを確認（未ログインは401）
-  before_action :authenticate_user, only: [ :me ]
+  before_action :authenticate_user, only: [ :me, :update_goals ]
 
   # POST /api/v1/users
   # ユーザー登録
@@ -34,9 +34,26 @@ class Api::V1::UsersController < ApplicationController
     render json: current_user.response_json, status: :ok
   end
 
+  # PUT /api/v1/users/goals
+  # 栄養目標を更新
+  def update_goals
+    if current_user.update(goal_params)
+      render json: current_user.response_json, status: :ok
+    else
+      render status: :unprocessable_entity, json: {
+        status: 422,
+        error: current_user.errors.full_messages.join(", ")
+      }
+    end
+  end
+
   private
 
   def user_params
     params.require(:user).permit(:name, :email, :password, :password_confirmation)
+  end
+
+  def goal_params
+    params.require(:user).permit(:target_calories, :target_protein, :target_fat, :target_carbohydrate)
   end
 end
