@@ -13,6 +13,7 @@ class RefreshTokenTest < ActionDispatch::IntegrationTest
   end
 
   # エンコード
+  # リフレッシュトークンのエンコードが正しく動作することを検証
   test "encode_token" do
     # payload[:exp]の値は想定通りか(1秒許容)
     payload = @encode.payload
@@ -30,6 +31,7 @@ class RefreshTokenTest < ActionDispatch::IntegrationTest
   end
 
   # デコード
+  # リフレッシュトークンのデコードが正しく動作することを検証
   test "decode_token" do
     decode = UserAuth::RefreshToken.new(token: @encode.token)
     payload = decode.payload
@@ -59,6 +61,7 @@ class RefreshTokenTest < ActionDispatch::IntegrationTest
   end
 
   # デコードオプション
+  # リフレッシュトークンのクレーム検証が正しく動作することを検証
   test "verify_claims" do
     @user.reload
     assert_equal @user.refresh_jti, @encode.payload[:jti]

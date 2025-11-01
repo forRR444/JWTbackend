@@ -12,6 +12,7 @@ class AccessTokenTest < ActionDispatch::IntegrationTest
     @lifetime = UserAuth.access_token_lifetime
   end
   # 共通メソッド
+  # 認証トークンの共通メソッドを検証
   test "auth_token_methods" do
     # 初期設定値は想定通りか
     assert_equal "HS256", @encode.send(:algorithm)
@@ -32,6 +33,7 @@ class AccessTokenTest < ActionDispatch::IntegrationTest
   end
 
   # エンコード検証
+  # トークンのエンコードが正しく動作することを検証
   test "encode_token" do
     # トークン有効期限は期待される時間と同じか(1秒許容)
     expect_lifetime = @lifetime.from_now.to_i
@@ -64,6 +66,7 @@ class AccessTokenTest < ActionDispatch::IntegrationTest
   end
 
   # デコード検証
+  # トークンのデコードが正しく動作することを検証
   test "decode_token" do
     decode = UserAuth::AccessToken.new(token: @encode.token)
     payload = decode.payload
@@ -115,6 +118,7 @@ class AccessTokenTest < ActionDispatch::IntegrationTest
   end
 
   # デコードオプション
+  # クレームの検証が正しく動作することを検証
   test "verify_claims" do
     # subオプションは有効か
     sub = @encode.user_id
@@ -136,6 +140,7 @@ class AccessTokenTest < ActionDispatch::IntegrationTest
   end
 
   # not activeユーザーの挙動
+  # 非アクティブユーザーのトークン処理を検証
   test "not_active_user" do
     not_active = User.create(
       name: "a", email: "a@a.a", password: "password"
