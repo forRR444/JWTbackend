@@ -1,61 +1,11 @@
-# Meal fixtures for testing
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  user: one
-  meal_type: breakfast
-  content: Toast and scrambled eggs
-  eaten_on: <%= Date.today %>
-  calories: 350
-  grams: 200
-  protein: 15.5
-  fat: 12.0
-  carbohydrate: 40.0
-  tags_text: "healthy,quick"
-
-two:
-  user: one
-  meal_type: lunch
-  content: Chicken salad
-  eaten_on: <%= Date.today %>
-  calories: 400
-  grams: 300
-  protein: 30.0
-  fat: 15.0
-  carbohydrate: 35.0
-  tags_text: "protein,salad"
-
-three:
-  user: one
-  meal_type: dinner
-  content: Grilled salmon with vegetables
-  eaten_on: <%= Date.yesterday %>
-  calories: 500
-  grams: 350
-  protein: 40.0
-  fat: 20.0
-  carbohydrate: 30.0
-  tags_text: "fish,healthy"
-
-four:
-  user: two
-  meal_type: breakfast
-  content: Cereal with milk
-  eaten_on: <%= Date.today %>
-  calories: 250
-  grams: 250
-  protein: 8.0
-  fat: 5.0
-  carbohydrate: 45.0
-  tags_text: "quick"
-
-five:
-  user: one
-  meal_type: snack
-  content: Apple and almonds
-  eaten_on: <%= Date.today %>
-  calories: 150
-  grams: 100
-  protein: 5.0
-  fat: 8.0
-  carbohydrate: 20.0
-  tags_text: "healthy,snack"
+# This model initially had no columns defined. If you add columns to the
+# model remove the "{}" from the fixture names and add the columns immediately
+# below each fixture, per the syntax in the comments below
+#
+one: {}
+# column: value
+#
+two: {}
+# column: value
