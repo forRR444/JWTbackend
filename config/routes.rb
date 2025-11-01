@@ -16,8 +16,12 @@ Rails.application.routes.draw do
           get :calendar  # /api/v1/meals/calendar
         end
       end
+      # foods
+      resources :foods, only: [:index]
+
       #users
       get 'me', to: 'users#me'
+      put 'users/goals', to: 'users#update_goals'
 
       resources :users, only: [:create]
     end
