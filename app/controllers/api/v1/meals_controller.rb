@@ -33,7 +33,7 @@ class Api::V1::MealsController < ApplicationController
     if @meal.update(meal_params)
       render json: @meal.as_json
     else
-      render json: { errors: meal.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @meal.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
