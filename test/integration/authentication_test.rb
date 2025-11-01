@@ -15,6 +15,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   end
 
   # 認証メソッドテスト
+  # 認証メソッドが正しく動作することを検証
   test "authenticate_user_method" do
     login(@params)
     access_token = res_body[@access_token_key]
