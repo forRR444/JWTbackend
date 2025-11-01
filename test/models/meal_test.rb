@@ -10,10 +10,12 @@ class MealTest < ActiveSupport::TestCase
     )
   end
 
+  # 有効な食事データが正しく作成されることを検証
   test "valid meal" do
     assert @meal.valid?
   end
 
+  # meal_typeのバリデーションを検証
   test "meal_type validation" do
     # 正しいmeal_typeは保存できる
     Meal::MEAL_TYPES.each do |type|
@@ -29,6 +31,7 @@ class MealTest < ActiveSupport::TestCase
     end
   end
 
+  # contentのバリデーションを検証
   test "content validation" do
     # contentが必須
     @meal.content = nil
@@ -44,6 +47,7 @@ class MealTest < ActiveSupport::TestCase
     assert @meal.valid?
   end
 
+  # eaten_onのバリデーションを検証
   test "eaten_on validation" do
     # eaten_onが必須
     @meal.eaten_on = nil
@@ -55,11 +59,13 @@ class MealTest < ActiveSupport::TestCase
     assert @meal.valid?
   end
 
+  # ユーザーとの関連付けを検証
   test "belongs to user" do
     assert_equal @user, @meal.user
     assert_includes @user.meals, @meal
   end
 
+  # タグのgetterとsetterが正しく動作することを検証
   test "tags getter and setter" do
     # tagsの設定（配列）
     @meal.tags = [ "healthy", "quick", "protein" ]
@@ -72,6 +78,7 @@ class MealTest < ActiveSupport::TestCase
     assert_equal [ "healthy", "quick", "protein" ], @meal.tags
   end
 
+  # 空の値を含むタグが除外されることを検証
   test "tags with empty values" do
     # 空の値は除外される
     @meal.tags = [ "healthy", "", " ", "quick" ]
@@ -81,6 +88,7 @@ class MealTest < ActiveSupport::TestCase
     assert_equal [ "healthy", "quick" ], @meal.tags
   end
 
+  # 重複したタグが除外されることを検証
   test "tags with duplicates" do
     # 重複は除外される
     @meal.tags = [ "healthy", "healthy", "quick" ]
@@ -90,6 +98,7 @@ class MealTest < ActiveSupport::TestCase
     assert_equal [ "healthy", "quick" ], @meal.tags
   end
 
+  # 空白を含むタグがトリムされることを検証
   test "tags with whitespace" do
     # 空白はトリムされる
     @meal.tags = [ " healthy ", "quick  ", "  protein" ]
@@ -99,16 +108,19 @@ class MealTest < ActiveSupport::TestCase
     assert_equal [ "healthy", "quick", "protein" ], @meal.tags
   end
 
+  # tags_textがnilの場合に空配列が返されることを検証
   test "tags from nil tags_text" do
     @meal.tags_text = nil
     assert_equal [], @meal.tags
   end
 
+  # tags_textが空文字列の場合に空配列が返されることを検証
   test "tags from empty tags_text" do
     @meal.tags_text = ""
     assert_equal [], @meal.tags
   end
 
+  # 栄養データが保存できることを検証
   test "nutrition data can be stored" do
     meal = @user.meals.create!(
       meal_type: "lunch",
@@ -128,6 +140,7 @@ class MealTest < ActiveSupport::TestCase
     assert_equal 42.3, meal.carbohydrate
   end
 
+  # 栄養データがnilの場合を検証
   test "nutrition data can be nil" do
     meal = @user.meals.create!(
       meal_type: "snack",
@@ -142,6 +155,7 @@ class MealTest < ActiveSupport::TestCase
     assert_nil meal.carbohydrate
   end
 
+  # for_userスコープが特定ユーザーの食事のみ返すことを検証
   test "scopes - for_user" do
     user2 = User.create!(
       name: "User 2",
@@ -161,6 +175,7 @@ class MealTest < ActiveSupport::TestCase
     assert_not_includes user1_meals, meal2
   end
 
+  # onスコープが特定日の食事のみ返すことを検証
   test "scopes - on" do
     today = Date.today
     yesterday = Date.yesterday
@@ -180,6 +195,7 @@ class MealTest < ActiveSupport::TestCase
     assert_not_includes yesterday_meals, @meal
   end
 
+  # betweenスコープが日付範囲内の食事のみ返すことを検証
   test "scopes - between" do
     today = Date.today
     yesterday = Date.yesterday
@@ -208,6 +224,7 @@ class MealTest < ActiveSupport::TestCase
     assert_not_includes single_day, yesterday_meal
   end
 
+  # as_jsonが適切なフィールドを含むことを検証
   test "as_json includes proper fields" do
     meal = @user.meals.create!(
       meal_type: "lunch",

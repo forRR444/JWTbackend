@@ -5,6 +5,7 @@ class UserTest < ActiveSupport::TestCase
     @user = active_user
   end
 
+  # 名前のバリデーションを検証
   test "name_validation" do
     # 入力必須
     user = User.new(email: "test@example.com", password: "password")
@@ -28,6 +29,7 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
+  # メールアドレスのバリデーションを検証
   test "email_validation" do
     # 入力必須
     user = User.new(name: "test", password: "password")
@@ -83,6 +85,7 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
+  # メールアドレスが小文字化されることを検証
   test "email_downcase" do
     # emailが小文字化されているか
     email = "USER@EXAMPLE.COM"
@@ -91,6 +94,7 @@ class UserTest < ActiveSupport::TestCase
     assert user.email == email.downcase
   end
 
+  # メールアドレスの一意性を検証
   test "email_uniqueness" do
     # メールアドレスは常に一意（activated に関わらず）
     email = "test@example.com"
@@ -129,6 +133,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal(1, User.where(email: email).count)
   end
 
+  # パスワードのバリデーションを検証
   test "password_validation" do
     # 入力必須
     user = User.new(name: "test", email: "test@example.com")
