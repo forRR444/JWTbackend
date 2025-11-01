@@ -1,46 +1,11 @@
-# Food fixtures for testing
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-chicken_breast:
-  food_code: "11001"
-  index_number: 1001
-  name: "鶏むね肉（皮なし）"
-  calories: 108
-  protein: 22.3
-  fat: 1.5
-  carbohydrate: 0.0
-
-white_rice:
-  food_code: "11002"
-  index_number: 1002
-  name: "白米"
-  calories: 168
-  protein: 2.5
-  fat: 0.3
-  carbohydrate: 37.1
-
-apple:
-  food_code: "11003"
-  index_number: 1003
-  name: "リンゴ"
-  calories: 54
-  protein: 0.2
-  fat: 0.1
-  carbohydrate: 14.6
-
-salmon:
-  food_code: "11004"
-  index_number: 1004
-  name: "サーモン"
-  calories: 138
-  protein: 20.0
-  fat: 6.0
-  carbohydrate: 0.0
-
-broccoli:
-  food_code: "11005"
-  index_number: 1005
-  name: "ブロッコリー"
-  calories: 33
-  protein: 4.3
-  fat: 0.5
-  carbohydrate: 5.2
+# This model initially had no columns defined. If you add columns to the
+# model remove the "{}" from the fixture names and add the columns immediately
+# below each fixture, per the syntax in the comments below
+#
+one: {}
+# column: value
+#
+two: {}
+# column: value
