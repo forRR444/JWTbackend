@@ -17,6 +17,10 @@ gem "rack-cors"
 # jwt Doc: https://rubygems.org/gems/jwt
 gem 'jwt', '~> 3.1', '>= 3.1.2'
 
+# Excel読み込み用Gem
+gem "roo", "~> 2.10"
+gem "csv"
+
 group :development, :test do
   gem "dotenv-rails"
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
