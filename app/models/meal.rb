@@ -16,21 +16,71 @@ class Meal < ApplicationRecord
   scope :on, ->(date) { where(eaten_on: date) }
   scope :between, ->(from, to) { where(eaten_on: from..to) }
 
-  # タグ名の配列でタグを設定（tags_text互換メソッド）
-  def tag_names=(names)
-    # 既存のタグをクリア
-    self.tags.clear
-
-    # 新しいタグを設定
-    return if names.blank?
-
-    tag_objects = Tag.find_or_create_by_names(Array(names))
-    self.tags = tag_objects
+  # tagsゲッターをオーバーライドして文字列配列を返す
+  def tags
+    # 永続化されている場合はタグ名の配列を返す
+    if persisted? || association(:tags).loaded?
+      tag_names
+    else
+      # まだ保存されていない場合は関連付けを返す
+      super
+    end
   end
 
-  # タグ名の配列を取得（tags_text互換メソッド）
+  # tagsをオーバーライドして文字列配列を受け取れるようにする
+  def tags=(value)
+    # 文字列配列が渡された場合
+    if value.is_a?(Array) && (value.empty? || value.first.is_a?(String))
+      self.tag_names = value
+    else
+      # Tagオブジェクトの配列が渡された場合は通常の関連付け
+      super
+    end
+  end
+
+  # タグ名の配列でタグを設定
+  def tag_names=(names)
+    # 配列に変換し、空白をトリム、空の値を除外、重複を削除
+    cleaned_names = Array(names)
+      .map { |name| name.to_s.strip }
+      .reject(&:blank?)
+      .uniq
+
+    # 空の場合はクリア
+    if cleaned_names.empty?
+      meal_tags.clear
+      return
+    end
+
+    tag_objects = Tag.find_or_create_by_names(cleaned_names)
+    # 既存の関連を置き換え
+    self.meal_tags.destroy_all
+    tag_objects.each do |tag|
+      meal_tags.build(tag: tag)
+    end
+  end
+
+  # タグ名の配列を取得
   def tag_names
-    tags.pluck(:name)
+    # 関連付けから直接取得（無限ループ回避）
+    if association(:tags).loaded?
+      association(:tags).target.map(&:name)
+    elsif persisted?
+      Tag.joins(:meal_tags).where(meal_tags: { meal_id: id }).pluck(:name)
+    else
+      # 未保存の場合は空配列
+      []
+    end
+  end
+
+  # カンマ区切りのタグ文字列を設定
+  def tags_text=(text)
+    self.tag_names = text.to_s.split(",").map(&:strip).reject(&:blank?)
+  end
+
+  # カンマ区切りのタグ文字列を取得
+  def tags_text
+    tag_names.join(",")
   end
 
   # レスポンス用JSONを生成（タグを配列で含む）
