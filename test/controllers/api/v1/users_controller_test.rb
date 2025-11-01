@@ -366,12 +366,16 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "60.0", json["target_fat"].to_s
     assert_equal "250.0", json["target_carbohydrate"].to_s
 
-    # データベースも更新されている
+    # NutritionGoalとして保存されている
     @user.reload
-    assert_equal 2000, @user.target_calories
-    assert_equal 150, @user.target_protein.to_i
-    assert_equal 60, @user.target_fat.to_i
-    assert_equal 250, @user.target_carbohydrate.to_i
+    current_goal = @user.current_goal
+    assert_not_nil current_goal
+    assert_equal 2000, current_goal.target_calories
+    assert_equal 150, current_goal.target_protein.to_i
+    assert_equal 60, current_goal.target_fat.to_i
+    assert_equal 250, current_goal.target_carbohydrate.to_i
+    assert_equal Date.today, current_goal.start_date
+    assert_nil current_goal.end_date
   end
 
   # 部分的な目標更新ができることを検証
@@ -406,10 +410,12 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :ok
 
     @user.reload
-    assert_nil @user.target_calories
-    assert_nil @user.target_protein
-    assert_nil @user.target_fat
-    assert_nil @user.target_carbohydrate
+    current_goal = @user.current_goal
+    assert_not_nil current_goal
+    assert_nil current_goal.target_calories
+    assert_nil current_goal.target_protein
+    assert_nil current_goal.target_fat
+    assert_nil current_goal.target_carbohydrate
   end
 
   # 小数値を受け入れることを検証
@@ -470,8 +476,9 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_equal original_email, @user.email
     assert_not @user.admin
 
-    # target_caloriesのみ変更されている
-    assert_equal 2000, @user.target_calories
+    # target_caloriesのみ変更されている（NutritionGoalとして）
+    current_goal = @user.current_goal
+    assert_equal 2000, current_goal.target_calories
   end
 
   # 有効期限切れトークンで401を返すことを検証
@@ -502,11 +509,13 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
 
   # 更新されたユーザーデータが返されることを検証
   test "update_goals returns updated user data" do
-    @user.update!(
+    # 既存の目標を作成
+    @user.nutrition_goals.create!(
       target_calories: 1500,
       target_protein: 100,
       target_fat: 50,
-      target_carbohydrate: 200
+      target_carbohydrate: 200,
+      start_date: 1.month.ago
     )
 
     goal_params = {
@@ -522,8 +531,45 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     json = res_body
     assert_equal 2500, json["target_calories"]
     assert_equal "200.0", json["target_protein"].to_s
-    # 更新していない値も含まれる
-    assert_equal "50.0", json["target_fat"].to_s
-    assert_equal "200.0", json["target_carbohydrate"].to_s
+    # 新しく設定された値のみが含まれる（部分更新）
+    # fat, carbohydrateは指定されていないのでnil
+  end
+
+  # 同じ日に複数回更新した場合、最新の値が返されることを検証
+  test "update_goals multiple times on same day returns latest values" do
+    # 1回目の更新
+    first_params = {
+      user: {
+        target_calories: 2000,
+        target_protein: 100
+      }
+    }
+    put api("/users/goals"), xhr: true, headers: @headers, params: first_params, as: :json
+    assert_response :ok
+
+    json = res_body
+    assert_equal 2000, json["target_calories"]
+    assert_equal "100.0", json["target_protein"].to_s
+
+    # 2回目の更新（同じ日）
+    second_params = {
+      user: {
+        target_calories: 2500,
+        target_protein: 150
+      }
+    }
+    put api("/users/goals"), xhr: true, headers: @headers, params: second_params, as: :json
+    assert_response :ok
+
+    json = res_body
+    assert_equal 2500, json["target_calories"]
+    assert_equal "150.0", json["target_protein"].to_s
+
+    # データベースを確認
+    @user.reload
+    current_goal = @user.current_goal
+    assert_not_nil current_goal
+    assert_equal 2500, current_goal.target_calories
+    assert_equal 150, current_goal.target_protein.to_i
   end
 end

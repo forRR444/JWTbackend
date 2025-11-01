@@ -22,10 +22,23 @@ class Api::V1::UsersController < ApplicationController
 
   # ユーザーの栄養目標値を更新
   def update_goals
-    if current_user.update(goal_params)
+    # 既存の有効な目標を終了
+    current_goal = current_user.current_goal
+    current_goal&.deactivate!
+
+    # 新しい目標を作成
+    @goal = current_user.nutrition_goals.build(goal_params)
+    @goal.start_date = Date.today
+
+    if @goal.save
+      # 関連付けを再読み込みして最新の目標を取得
+      current_user.nutrition_goals.reload
       render json: current_user.response_json, status: :ok
     else
-      render_user_errors(current_user)
+      render status: :unprocessable_entity, json: {
+        status: 422,
+        error: @goal.errors.full_messages.join(", ")
+      }
     end
   end
 
