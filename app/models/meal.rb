@@ -22,7 +22,7 @@ class Meal < ApplicationRecord
   scope :between, ->(from, to) { where(eaten_on: from..to) }
 
   def as_json(options = {})
-    super({ only: [:id, :meal_type, :content, :calories, :grams, :created_at, :updated_at] }.merge(options)).merge({
+    super({ only: [ :id, :meal_type, :content, :calories, :grams, :protein, :fat, :carbohydrate, :eaten_on, :created_at, :updated_at ] }.merge(options)).merge({
       tags: tags
     })
   end
