@@ -7,10 +7,10 @@ class MealFiltersServiceTest < ActiveSupport::TestCase
     @user = active_user
 
     # テスト用の食事データ
-    @today = Date.today
-    @yesterday = Date.yesterday
-    @two_days_ago = @today - 2
-    @three_days_ago = @today - 3
+    @today = Date.current
+    @yesterday = 1.day.ago.to_date
+    @two_days_ago = 2.days.ago.to_date
+    @three_days_ago = 3.days.ago.to_date
 
     @meal_today = @user.meals.create!(
       meal_type: "breakfast",
