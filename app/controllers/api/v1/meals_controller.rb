@@ -76,6 +76,6 @@ class Api::V1::MealsController < ApplicationController
 
   def meal_params
     # tags は配列として受け取り、モデル側で tags_text へ変換
-    params.require(:meal).permit(:meal_type, :content, :eaten_on, :calories, :grams, tags: [])
+    params.require(:meal).permit(:meal_type, :content, :eaten_on, :calories, :grams, :protein, :fat, :carbohydrate, tags: [])
   end
 end
