@@ -10,6 +10,10 @@ class User < ApplicationRecord
   has_secure_password
   # ユーザーが削除されたら食事データも削除
   has_many :meals, dependent: :destroy
+  # 栄養目標の履歴管理
+  has_many :nutrition_goals, dependent: :destroy
+  # ユーザーカスタム食品
+  has_many :user_foods, dependent: :destroy
 
   ## バリデーション設定
   # 名前: 必須・30文字以内
@@ -60,16 +64,27 @@ class User < ApplicationRecord
     update!(refresh_jti: nil)
   end
 
+  # 現在有効な栄養目標を取得
+  def current_goal
+    nutrition_goals.active.order(start_date: :desc).first
+  end
+
   # レスポンス用JSON(id・名前・目標栄養素)を生成
   def response_json(payload = {})
-    as_json(only: [
-      :id,
-      :name,
-      :target_calories,
-      :target_protein,
-      :target_fat,
-      :target_carbohydrate
-    ]).merge(payload).with_indifferent_access
+    goal = current_goal
+    base_json = as_json(only: [ :id, :name ])
+
+    # 現在の目標値を追加
+    if goal
+      base_json.merge!(
+        target_calories: goal.target_calories,
+        target_protein: goal.target_protein,
+        target_fat: goal.target_fat,
+        target_carbohydrate: goal.target_carbohydrate
+      )
+    end
+
+    base_json.merge(payload).with_indifferent_access
   end
 
   private
