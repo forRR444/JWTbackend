@@ -1,5 +1,7 @@
 class Meal < ApplicationRecord
   belongs_to :user
+  has_many :meal_tags, dependent: :destroy
+  has_many :tags, through: :meal_tags
 
   # 食事タイプ（朝食/昼食/夕食/間食/その他）
   MEAL_TYPES = %w[breakfast lunch dinner snack other].freeze
@@ -14,13 +16,21 @@ class Meal < ApplicationRecord
   scope :on, ->(date) { where(eaten_on: date) }
   scope :between, ->(from, to) { where(eaten_on: from..to) }
 
-  # タグの取得・設定
-  def tags
-    parse_tags_from_text(tags_text)
+  # タグ名の配列でタグを設定（tags_text互換メソッド）
+  def tag_names=(names)
+    # 既存のタグをクリア
+    self.tags.clear
+
+    # 新しいタグを設定
+    return if names.blank?
+
+    tag_objects = Tag.find_or_create_by_names(Array(names))
+    self.tags = tag_objects
   end
 
-  def tags=(arr)
-    self.tags_text = build_tags_text(arr)
+  # タグ名の配列を取得（tags_text互換メソッド）
+  def tag_names
+    tags.pluck(:name)
   end
 
   # レスポンス用JSONを生成（タグを配列で含む）
@@ -41,23 +51,6 @@ class Meal < ApplicationRecord
       ]
     }
 
-    super(base_attributes.merge(options)).merge({ tags: tags })
+    super(base_attributes.merge(options)).merge({ tags: tag_names })
   end
-
-  private
-    # タグテキストを配列に変換
-    def parse_tags_from_text(text)
-      return [] if text.blank?
-      text.split(",").map(&:strip).reject(&:empty?)
-    end
-
-    # 配列からタグテキストを生成
-    def build_tags_text(arr)
-      Array(arr)
-        .map(&:to_s)
-        .map(&:strip)
-        .reject(&:empty?)
-        .uniq
-        .join(",")
-    end
 end
