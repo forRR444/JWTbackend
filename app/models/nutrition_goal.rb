@@ -37,7 +37,13 @@ class NutritionGoal < ApplicationRecord
   end
 
   # 目標を無効化（終了日を設定）
-  def deactivate!(end_date = Date.yesterday)
+  def deactivate!(end_date = nil)
+    # end_dateが指定されていない場合は、昨日または開始日の前日を使う
+    end_date ||= [ Date.yesterday, start_date - 1.day ].max
+
+    # start_dateより前の日付は設定できないので、start_dateと同じ日にする
+    end_date = [ end_date, start_date ].max
+
     update!(end_date: end_date)
   end
 
