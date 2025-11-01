@@ -58,7 +58,14 @@ class User < ApplicationRecord
 
   # 共通のJSONレスポンス
   def response_json(payload = {})
-  as_json(only: [:id, :name]).merge(payload).with_indifferent_access
+    as_json(only: [
+      :id,
+      :name,
+      :target_calories,
+      :target_protein,
+      :target_fat,
+      :target_carbohydrate
+    ]).merge(payload).with_indifferent_access
   end
 
   private
