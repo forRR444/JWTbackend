@@ -96,14 +96,14 @@ class Api::V1::AuthTokenControllerTest < ActionDispatch::IntegrationTest
     pass = "password"
     invalid_params = { auth: { email: @user.email, password: pass + "a" } }
     login(invalid_params)
-    response_check_of_invalid_request 404
+    response_check_of_invalid_request 404, "メールアドレスまたはパスワードが正しくありません。"
 
     # アクティブユーザーでない場合
     inactive_user = User.create(name: "a", email: "a@a.a", password: pass)
     invalid_params = { auth: { email: inactive_user.email, password: pass } }
     assert_not inactive_user.activated
     login(invalid_params)
-    response_check_of_invalid_request 404
+    response_check_of_invalid_request 404, "メールアドレスまたはパスワードが正しくありません。"
 
     # Ajax通信ではない場合
     post api("/auth_token"), xhr: false, params: @params

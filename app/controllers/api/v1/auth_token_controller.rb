@@ -62,7 +62,10 @@ class Api::V1::AuthTokenController < ApplicationController
     # 404レスポンス
     # Doc: https://gist.github.com/mlanett/a31c340b132ddefa9cca
     def not_found
-      head(:not_found)
+      render status: :not_found, json: {
+        status: 404,
+        error: "メールアドレスまたはパスワードが正しくありません。"
+      }
     end
 
     # 401レスポンス（jti無効時）
