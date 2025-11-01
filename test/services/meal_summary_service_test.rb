@@ -44,6 +44,7 @@ class MealSummaryServiceTest < ActiveSupport::TestCase
     )
   end
 
+  # サマリーにrangeとgroupsキーが含まれることを確認
   test "returns summary with range and groups" do
     service = MealSummaryService.new(@user, {})
     result = service.call
@@ -52,6 +53,7 @@ class MealSummaryServiceTest < ActiveSupport::TestCase
     assert result.key?(:groups)
   end
 
+  # 食事がタイプ別（朝食/昼食/夕食/間食/その他）にグルーピングされることを確認
   test "groups meals by type" do
     params = { date: @today.to_s }
     service = MealSummaryService.new(@user, params)
@@ -66,6 +68,7 @@ class MealSummaryServiceTest < ActiveSupport::TestCase
     assert groups.key?("other")
   end
 
+  # データが空でもすべてのmeal_typeのキーが含まれることを確認
   test "includes all meal types even when empty" do
     # 新しいユーザーで食事なし
     new_user = User.create!(
@@ -85,6 +88,7 @@ class MealSummaryServiceTest < ActiveSupport::TestCase
     end
   end
 
+  # 日付フィルターで指定した日の食事が各グループに正しく含まれることを確認
   test "groups contain correct meals for date filter" do
     params = { date: @today.to_s }
     service = MealSummaryService.new(@user, params)
@@ -108,6 +112,7 @@ class MealSummaryServiceTest < ActiveSupport::TestCase
     assert_equal @other.id, groups["other"].first.id
   end
 
+  # 日付範囲（from-to）でフィルタリングできることを確認
   test "filters by date range" do
     params = { from: @yesterday.to_s, to: @today.to_s }
     service = MealSummaryService.new(@user, params)
@@ -122,6 +127,7 @@ class MealSummaryServiceTest < ActiveSupport::TestCase
     assert_includes breakfast_ids, @yesterday_meal.id
   end
 
+  # 単一日付指定時のrange情報が正しいことを確認
   test "range info for single date" do
     params = { date: @today.to_s }
     service = MealSummaryService.new(@user, params)
@@ -131,6 +137,7 @@ class MealSummaryServiceTest < ActiveSupport::TestCase
     assert_equal @today.to_s, range[:date]
   end
 
+  # 日付範囲指定時のrange情報が正しいことを確認
   test "range info for date range" do
     params = { from: @yesterday.to_s, to: @today.to_s }
     service = MealSummaryService.new(@user, params)
@@ -141,6 +148,7 @@ class MealSummaryServiceTest < ActiveSupport::TestCase
     assert_equal @today.to_s, range[:to]
   end
 
+  # フィルター未指定時のrange情報がnilであることを確認
   test "range info when no filters" do
     service = MealSummaryService.new(@user, {})
     result = service.call
@@ -151,6 +159,7 @@ class MealSummaryServiceTest < ActiveSupport::TestCase
     assert_nil range[:to]
   end
 
+  # 同じタイプの食事が複数ある場合に正しく処理されることを確認
   test "handles multiple meals of same type" do
     # 2つ目の朝食を追加
     second_breakfast = @user.meals.create!(
@@ -171,6 +180,7 @@ class MealSummaryServiceTest < ActiveSupport::TestCase
     assert_includes breakfast_ids, second_breakfast.id
   end
 
+  # 現在のユーザーの食事のみが含まれ、他ユーザーの食事が含まれないことを確認
   test "only includes current user's meals" do
     other_user = User.create!(
       name: "Other User",
@@ -195,6 +205,7 @@ class MealSummaryServiceTest < ActiveSupport::TestCase
     assert_not_includes breakfast_ids, other_meal.id
   end
 
+  # 食事がないタイプのグループは空配列となることを確認
   test "empty groups for types without meals" do
     # 朝食のみのユーザー
     user = User.create!(
@@ -222,6 +233,7 @@ class MealSummaryServiceTest < ActiveSupport::TestCase
     assert_equal 0, groups["other"].length
   end
 
+  # MealFiltersServiceを使用してフィルタリングされることを確認
   test "uses MealFiltersService for filtering" do
     # MealFiltersServiceの動作を確認
     params = { date: @yesterday.to_s }
@@ -241,6 +253,7 @@ class MealSummaryServiceTest < ActiveSupport::TestCase
     assert_equal 0, groups["other"].length
   end
 
+  # フィルターサービスからの食事の順序（created_at降順）が保持されることを確認
   test "preserves meal order from filter service" do
     # 複数の朝食を時間差で作成
     first = @user.meals.create!(
@@ -267,6 +280,7 @@ class MealSummaryServiceTest < ActiveSupport::TestCase
     assert_equal first.id, breakfast_meals[1].id
   end
 
+  # 各グループがMealオブジェクトの配列であり、正しいタイプであることを確認
   test "groups are arrays of meal objects" do
     params = { date: @today.to_s }
     service = MealSummaryService.new(@user, params)
@@ -282,6 +296,7 @@ class MealSummaryServiceTest < ActiveSupport::TestCase
     end
   end
 
+  # 無効な日付が指定された場合でもエラーを起こさず適切に処理されることを確認
   test "handles invalid date gracefully" do
     params = { date: "invalid-date" }
     service = MealSummaryService.new(@user, params)
@@ -293,6 +308,7 @@ class MealSummaryServiceTest < ActiveSupport::TestCase
     end
   end
 
+  # Mealオブジェクトがすべての属性を含んでいることを確認
   test "meal objects include all attributes" do
     params = { date: @today.to_s }
     service = MealSummaryService.new(@user, params)
