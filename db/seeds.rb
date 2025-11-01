@@ -1,4 +1,4 @@
-table_names = %w[users]
+table_names = %w[users foods meals]
 
 table_names.each do |table_name|
   path = Rails.root.join("db/seeds/#{Rails.env}/#{table_name}.rb")
