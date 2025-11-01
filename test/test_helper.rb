@@ -10,8 +10,9 @@ module ActiveSupport
   class TestCase
     # プロセスが分岐した直後に呼ばれる
     parallelize_setup do |worker|
-      # seedデータの読み込み
-      load "#{Rails.root}/db/seeds.rb"
+      # seedデータの読み込み（テストは各自でデータを作成するためコメントアウト）
+      # db/seeds/test/ のデータは手動テスト用
+      # load "#{Rails.root}/db/seeds.rb"
     end
 
     # 並列テストの有効化・無効化
