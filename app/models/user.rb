@@ -66,7 +66,7 @@ class User < ApplicationRecord
 
   # 現在有効な栄養目標を取得
   def current_goal
-    nutrition_goals.active.order(start_date: :desc).first
+    nutrition_goals.active.order(start_date: :desc, id: :desc).first
   end
 
   # レスポンス用JSON(id・名前・目標栄養素)を生成
@@ -74,15 +74,13 @@ class User < ApplicationRecord
     goal = current_goal
     base_json = as_json(only: [ :id, :name ])
 
-    # 現在の目標値を追加
-    if goal
-      base_json.merge!(
-        target_calories: goal.target_calories,
-        target_protein: goal.target_protein,
-        target_fat: goal.target_fat,
-        target_carbohydrate: goal.target_carbohydrate
-      )
-    end
+    # 現在の目標値を追加（目標がない場合はnull）
+    base_json.merge!(
+      target_calories: goal&.target_calories,
+      target_protein: goal&.target_protein,
+      target_fat: goal&.target_fat,
+      target_carbohydrate: goal&.target_carbohydrate
+    )
 
     base_json.merge(payload).with_indifferent_access
   end
