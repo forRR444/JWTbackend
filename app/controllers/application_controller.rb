@@ -20,6 +20,11 @@ class ApplicationController < ActionController::API
       render status: 500, json: { status: 500, error: msg }
     end
 
+    # Not Found
+    def not_found
+      render status: 404, json: { status: 404, error: "Not Found" }
+    end
+
 
 
 end
