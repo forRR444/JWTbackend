@@ -5,8 +5,8 @@ require "test_helper"
 class MealSummaryServiceTest < ActiveSupport::TestCase
   def setup
     @user = active_user
-    @today = Date.today
-    @yesterday = Date.yesterday
+    @today = Date.current
+    @yesterday = 1.day.ago.to_date
 
     # 各meal_typeのデータを作成
     @breakfast = @user.meals.create!(

@@ -8,7 +8,7 @@ class MealTest < ActiveSupport::TestCase
     @meal = @user.meals.create!(
       meal_type: "breakfast",
       content: "Toast and eggs",
-      eaten_on: Date.today
+      eaten_on: Date.current
     )
   end
 
@@ -127,7 +127,7 @@ class MealTest < ActiveSupport::TestCase
     meal = @user.meals.create!(
       meal_type: "lunch",
       content: "Chicken salad",
-      eaten_on: Date.today,
+      eaten_on: Date.current,
       calories: 450,
       grams: 300,
       protein: 35.5,
@@ -147,7 +147,7 @@ class MealTest < ActiveSupport::TestCase
     meal = @user.meals.create!(
       meal_type: "snack",
       content: "Apple",
-      eaten_on: Date.today
+      eaten_on: Date.current
     )
 
     assert_nil meal.calories
@@ -169,7 +169,7 @@ class MealTest < ActiveSupport::TestCase
     meal2 = user2.meals.create!(
       meal_type: "dinner",
       content: "Steak",
-      eaten_on: Date.today
+      eaten_on: Date.current
     )
 
     user1_meals = Meal.for_user(@user)
@@ -179,8 +179,8 @@ class MealTest < ActiveSupport::TestCase
 
   # onスコープが特定日の食事のみ返すことを検証
   test "scopes - on" do
-    today = Date.today
-    yesterday = Date.yesterday
+    today = Date.current
+    yesterday = 1.day.ago.to_date
 
     yesterday_meal = @user.meals.create!(
       meal_type: "dinner",
@@ -199,9 +199,9 @@ class MealTest < ActiveSupport::TestCase
 
   # betweenスコープが日付範囲内の食事のみ返すことを検証
   test "scopes - between" do
-    today = Date.today
-    yesterday = Date.yesterday
-    two_days_ago = Date.today - 2
+    today = Date.current
+    yesterday = 1.day.ago.to_date
+    two_days_ago = 2.days.ago.to_date
 
     yesterday_meal = @user.meals.create!(
       meal_type: "dinner",
@@ -231,7 +231,7 @@ class MealTest < ActiveSupport::TestCase
     meal = @user.meals.create!(
       meal_type: "lunch",
       content: "Test meal",
-      eaten_on: Date.today,
+      eaten_on: Date.current,
       calories: 350,
       grams: 250,
       protein: 20,

@@ -5,7 +5,7 @@ require "test_helper"
 class MealCalendarServiceTest < ActiveSupport::TestCase
   def setup
     @user = active_user
-    @today = Date.today
+    @today = Date.current
     @month_string = @today.strftime("%Y-%m")
     @first_of_month = Date.new(@today.year, @today.month, 1)
     @last_of_month = @first_of_month.end_of_month
