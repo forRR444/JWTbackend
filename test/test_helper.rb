@@ -60,6 +60,7 @@ module ActiveSupport
     UserAuth.token_issuer   = "rails8-example"
     UserAuth.token_audience = "rails8-example-client"
     UserAuth.token_signature_algorithm = "HS256"
+    UserAuth.token_secret_signature_key = Rails.application.credentials.secret_key_base || "test_secret_key"
     UserAuth.access_token_lifetime = 30.minutes
   end
 end
