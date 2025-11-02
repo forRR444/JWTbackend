@@ -26,8 +26,9 @@ module Backend
 
     # Cookieのsamesite属性を変更する(開発環境でnoneを使用するとCookieの共有ができない)
     if Rails.env.production?
-      config.action_dispatch.cookies_same_site_protection =
-        ENV["COOKIES_SAME_SITE"].to_sym
+      # 環境変数が未設定の場合はデフォルトで:laxを使用
+      cookies_same_site = ENV.fetch("COOKIES_SAME_SITE", "lax").to_sym
+      config.action_dispatch.cookies_same_site_protection = cookies_same_site
     end
 
     # Configuration for the application, engines, and railties goes here.
