@@ -102,13 +102,14 @@ Rails.application.configure do
     # ヘルスチェックエンドポイントは認証をスキップ
     config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
   else
-    # デフォルトではRenderのドメインとlocalhostを許可
+    # デフォルトではHeroku、Renderのドメインとlocalhostを許可
     config.hosts = [
       "localhost",
       /localhost:\d+/,
       "127.0.0.1",
       /127\.0\.0\.1:\d+/,
-      /.*\.onrender\.com/  # Renderのすべてのドメインを許可
+      /.*\.herokuapp\.com/,  # Herokuのすべてのドメインを許可
+      /.*\.onrender\.com/    # Renderのすべてのドメインを許可
     ]
   end
 end
