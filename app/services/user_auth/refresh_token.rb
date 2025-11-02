@@ -65,7 +65,9 @@ module UserAuth
 
     # jtiをUsersテーブルに保存する
     def remember_jti(user_id)
-      User.find(user_id).remember(payload_jti)
+      jti_to_save = payload_jti
+      Rails.logger.info "[DEBUG] Saving JTI to DB: #{jti_to_save} for user #{user_id}"
+      User.find(user_id).remember(jti_to_save)
     end
 
     ##  デコードメソッド
@@ -74,8 +76,16 @@ module UserAuth
     def verify_jti?(jti, payload)
       user_id = get_user_id_from(payload) # 暗号化subを取り出す
       decode_user = entity_for_user(user_id) # 復号 => User取得
-      decode_user.refresh_jti == jti # DBに記録のJTIと一致するか
+      db_jti = decode_user.refresh_jti
+
+      Rails.logger.info "[DEBUG] JTI Verification:"
+      Rails.logger.info "[DEBUG]   Token JTI: #{jti}"
+      Rails.logger.info "[DEBUG]   DB JTI: #{db_jti}"
+      Rails.logger.info "[DEBUG]   Match: #{db_jti == jti}"
+
+      db_jti == jti # DBに記録のJTIと一致するか
     rescue UserAuth.not_found_exception_class
+      Rails.logger.error "[DEBUG] User not found in JTI verification"
       false
     end
 
