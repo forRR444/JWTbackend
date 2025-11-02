@@ -24,10 +24,12 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
-  config.assume_ssl = true
+  # Docker環境ではSSLを無効化できるように環境変数で制御
+  config.assume_ssl = ENV.fetch("RAILS_ASSUME_SSL", "true") == "true"
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = true
+  # Docker環境ではSSLを無効化できるように環境変数で制御
+  config.force_ssl = ENV.fetch("RAILS_FORCE_SSL", "true") == "true"
 
   # Skip http-to-https redirect for the default health check endpoint.
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
@@ -46,11 +48,16 @@ Rails.application.configure do
   config.active_support.report_deprecations = false
 
   # Replace the default in-process memory cache store with a durable alternative.
-  config.cache_store = :solid_cache_store
+  # Docker環境では複雑な設定を避けるため、シンプルなmemory_storeを使用
+  config.cache_store = :memory_store
+  # config.cache_store = :solid_cache_store
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
-  config.active_job.queue_adapter = :solid_queue
-  config.solid_queue.connects_to = { database: { writing: :queue } }
+  # Docker環境では複雑な設定を避けるため、シンプルなasyncアダプタを使用
+  # 本番環境でSolid Queueを使う場合は、複数データベース設定が必要
+  config.active_job.queue_adapter = :async
+  # config.active_job.queue_adapter = :solid_queue
+  # config.solid_queue.connects_to = { database: { writing: :queue } }
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
@@ -81,7 +88,10 @@ Rails.application.configure do
   # Enable DNS rebinding protection and other `Host` header attacks.
   # 環境変数 APP_HOST で許可するホストを指定
   # 環境変数 APP_DOMAIN でサブドメインのワイルドカードパターンを指定
-  if ENV["APP_HOST"].present?
+  # Docker環境では DISABLE_HOST_CHECK=true で無効化可能
+  if ENV["DISABLE_HOST_CHECK"] == "true"
+    config.hosts.clear
+  elsif ENV["APP_HOST"].present?
     allowed_hosts = [ENV["APP_HOST"]]
 
     # APP_DOMAIN が設定されている場合、サブドメインも許可
@@ -91,5 +101,8 @@ Rails.application.configure do
 
     # ヘルスチェックエンドポイントは認証をスキップ
     config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  else
+    # デフォルトではlocalhostのみ許可
+    config.hosts = ["localhost", /localhost:\d+/, "127.0.0.1", /127\.0\.0\.1:\d+/]
   end
 end
