@@ -3,15 +3,16 @@
 module UserAuth
   # access tokenの有効期限
   mattr_accessor :access_token_lifetime
-  self.access_token_lifetime = 10.minute
+  self.access_token_lifetime = ENV.fetch("ACCESS_TOKEN_LIFETIME", "1").to_i.minute
 
   # refresh tokenの有効期限
   mattr_accessor :refresh_token_lifetime
-  self.refresh_token_lifetime = 1.day
+  self.refresh_token_lifetime = ENV.fetch("REFRESH_TOKEN_LIFETIME", "1440").to_i.minute
 
   # cookieからrefresh tokenを取得する際のキー
+  # 環境ごとに異なるCookie名を使用（localhost間の干渉を防ぐ）
   mattr_accessor :session_key
-  self.session_key = :refresh_token
+  self.session_key = ENV.fetch("SESSION_COOKIE_NAME", "refresh_token").to_sym
 
   # userを識別するクレーム名
   mattr_accessor :user_claim
