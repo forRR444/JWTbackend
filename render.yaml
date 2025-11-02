@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: jwt-meal-tracking
-    runtime: ruby
-    buildCommand: bundle install
-    preDeployCommand: bundle exec rails db:migrate
-    startCommand: bundle exec puma -C config/puma.rb
