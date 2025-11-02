@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: jwt-meal-tracking
+    runtime: ruby
+    buildCommand: ./bin/render-build.sh
+    startCommand: bundle exec puma -C config/puma.rb
