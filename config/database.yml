@@ -22,6 +22,10 @@ default: &default
 
 development:
   <<: *default
+  # Docker環境ではDATABASE_URLを優先的に使用
+  # DATABASE_URLが設定されている場合は、そちらを使う（Docker環境）
+  # 設定されていない場合は、デフォルトのローカル設定を使う（ローカル環境）
+  url: <%= ENV['DATABASE_URL'] %>
   database: backend_development
 
   # The specified database role being used to connect to PostgreSQL.
@@ -79,20 +83,32 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  primary: &primary_production
-    <<: *default
-    database: backend_production
-    username: backend
-    password: <%= ENV["BACKEND_DATABASE_PASSWORD"] %>
-  cache:
-    <<: *primary_production
-    database: backend_production_cache
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *primary_production
-    database: backend_production_queue
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *primary_production
-    database: backend_production_cable
-    migrations_paths: db/cable_migrate
+  # Docker環境ではDATABASE_URLを優先的に使用
+  # DATABASE_URLが設定されている場合は、そちらを使う
+  # 設定されていない場合は、個別の設定を使う
+  <<: *default
+  url: <%= ENV['DATABASE_URL'] %>
+
+  # DATABASE_URLが設定されていない場合のフォールバック設定
+  # database: backend_production
+  # username: backend
+  # password: <%= ENV["BACKEND_DATABASE_PASSWORD"] %>
+
+  # 複数データベース設定（Solid Cache, Queue, Cableを使う場合）
+  # primary: &primary_production
+  #   <<: *default
+  #   database: backend_production
+  #   username: backend
+  #   password: <%= ENV["BACKEND_DATABASE_PASSWORD"] %>
+  # cache:
+  #   <<: *primary_production
+  #   database: backend_production_cache
+  #   migrations_paths: db/cache_migrate
+  # queue:
+  #   <<: *primary_production
+  #   database: backend_production_queue
+  #   migrations_paths: db/queue_migrate
+  # cable:
+  #   <<: *primary_production
+  #   database: backend_production_cable
+  #   migrations_paths: db/cable_migrate
