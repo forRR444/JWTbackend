@@ -25,8 +25,11 @@ development:
   # Docker環境ではDATABASE_URLを優先的に使用
   # DATABASE_URLが設定されている場合は、そちらを使う（Docker環境）
   # 設定されていない場合は、デフォルトのローカル設定を使う（ローカル環境）
+  <% if ENV['DATABASE_URL'].present? %>
   url: <%= ENV['DATABASE_URL'] %>
+  <% else %>
   database: backend_development
+  <% end %>
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
@@ -83,16 +86,8 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  # Docker環境ではDATABASE_URLを優先的に使用
-  # DATABASE_URLが設定されている場合は、そちらを使う
-  # 設定されていない場合は、個別の設定を使う
-  <<: *default
+  # HerokuやRenderなどのクラウドプラットフォームではDATABASE_URLを使用
   url: <%= ENV['DATABASE_URL'] %>
-
-  # DATABASE_URLが設定されていない場合のフォールバック設定
-  # database: backend_production
-  # username: backend
-  # password: <%= ENV["BACKEND_DATABASE_PASSWORD"] %>
 
   # 複数データベース設定（Solid Cache, Queue, Cableを使う場合）
   # primary: &primary_production
