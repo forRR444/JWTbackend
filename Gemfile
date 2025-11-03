@@ -22,7 +22,7 @@ gem "jwt", "~> 3.1", ">= 3.1.2"
 
 # Excel読み込み用Gem
 gem "csv"
-gem "roo", "~> 2.10"
+gem "roo", "~> 3.0"
 
 group :development, :test do
   gem "brakeman", require: false
