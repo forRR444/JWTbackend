@@ -39,12 +39,27 @@ module UserSessionizeService
 
   # リフレッシュトークンからユーザーを取得（無効ならnil）
   def fetch_user_from_refresh_token
-    User.from_refresh_token(token_from_cookies)
-  rescue JWT::InvalidJtiError
+    token = token_from_cookies
+    Rails.logger.debug "[DEBUG] Attempting to fetch user from refresh token..."
+    user = User.from_refresh_token(token)
+    Rails.logger.debug "[DEBUG] Successfully fetched user: #{user&.id}"
+    user
+  rescue JWT::InvalidJtiError => e
     # jtiエラーの場合はcontrollerに処理を委任
+    Rails.logger.error "[ERROR] Invalid JTI: #{e.message}"
     catch_invalid_jti
-  rescue UserAuth.not_found_exception_class,
-         JWT::DecodeError, JWT::EncodeError
+  rescue UserAuth.not_found_exception_class => e
+    Rails.logger.error "[ERROR] User not found: #{e.message}"
+    nil
+  rescue JWT::DecodeError => e
+    Rails.logger.error "[ERROR] JWT Decode error: #{e.message}"
+    nil
+  rescue JWT::EncodeError => e
+    Rails.logger.error "[ERROR] JWT Encode error: #{e.message}"
+    nil
+  rescue StandardError => e
+    Rails.logger.error "[ERROR] Unexpected error in fetch_user_from_refresh_token: #{e.class} - #{e.message}"
+    Rails.logger.error e.backtrace.first(5).join("\n")
     nil
   end
 
