@@ -20,6 +20,10 @@ module UserSessionizeService
 
   # Cookieからリフレッシュトークンを取得
   def token_from_cookies
+    # デバッグログ
+    Rails.logger.debug "[DEBUG] Session key: #{session_key.inspect}"
+    Rails.logger.debug "[DEBUG] All cookies: #{cookies.to_h.keys.inspect}"
+    Rails.logger.debug "[DEBUG] Token from cookies[#{session_key}]: #{cookies[session_key]&.slice(0, 50)}"
     cookies[session_key]
   end
 
