@@ -9,7 +9,11 @@ module TokenCookieHandler
   # リフレッシュトークンをHttpOnly Cookieに設定
   def set_refresh_token_cookie(user)
     refresh = user.encode_refresh_token # トークン生成（JTIはRefreshToken#initializeで保存済み）
+    set_refresh_token_cookie_from_token(refresh)
+  end
 
+  # 既に生成されたリフレッシュトークンをCookieに設定
+  def set_refresh_token_cookie_from_token(refresh)
     # same_site設定: 環境変数で制御（デフォルトは:lax）
     # COOKIES_SAME_SITEが設定されている場合はその値を使用
     same_site_value = if ENV["COOKIES_SAME_SITE"].present?
