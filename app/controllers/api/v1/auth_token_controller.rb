@@ -21,15 +21,17 @@ module Api
       # ログイン
       def create
         @user = login_user
-        set_refresh_token_cookie(@user) # Cookieにリフレッシュトークンを保存
-        render json: login_response # アクセストークンを返す
+        @refresh_token = @user.encode_refresh_token # リフレッシュトークンを生成
+        set_refresh_token_cookie_from_token(@refresh_token) # Cookieにリフレッシュトークンを保存
+        render json: login_response # アクセストークンとリフレッシュトークンを返す
       end
 
       # リフレッシュ
       def refresh
         @user = session_user
-        set_refresh_token_cookie(@user) # 新しいリフレッシュトークンを設定
-        render json: login_response # 新しいアクセストークンを返す
+        @refresh_token = @user.encode_refresh_token # 新しいリフレッシュトークンを生成
+        set_refresh_token_cookie_from_token(@refresh_token) # 新しいリフレッシュトークンを設定
+        render json: login_response # 新しいアクセストークンとリフレッシュトークンを返す
       end
 
       # ログアウト
@@ -60,6 +62,7 @@ module Api
         {
           token: access.token, # アクセストークン文字列
           expires: access.payload[:exp], # 有効期限
+          refresh_token: @refresh_token&.token, # リフレッシュトークン（localStorageに保存用）
           user: @user.response_json(sub: access.payload[:sub]) # ユーザー情報
         }
       end
