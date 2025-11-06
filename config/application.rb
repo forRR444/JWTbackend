@@ -31,6 +31,11 @@ module Backend
       config.action_dispatch.cookies_same_site_protection = cookies_same_site
     end
 
+    # Content Security Policy設定（XSS攻撃対策）
+    config.action_dispatch.default_headers.merge!({
+      'Content-Security-Policy' => "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' #{ENV.fetch('ALLOWED_ORIGINS', 'http://localhost:5173').split(',').join(' ')};"
+    })
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

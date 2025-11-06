@@ -18,13 +18,23 @@ module UserSessionizeService
 
   private
 
-  # Cookieからリフレッシュトークンを取得
+  # Cookieまたはリフレッシュトークンを取得
+  # Cookie優先、なければAuthorizationヘッダーから取得
   def token_from_cookies
-    # デバッグログ
-    Rails.logger.debug "[DEBUG] Session key: #{session_key.inspect}"
-    Rails.logger.debug "[DEBUG] All cookies: #{cookies.to_h.keys.inspect}"
-    Rails.logger.debug "[DEBUG] Token from cookies[#{session_key}]: #{cookies[session_key]&.slice(0, 50)}"
-    cookies[session_key]
+    # Cookieから取得を試みる
+    token = cookies[session_key]
+
+    # CookieになければAuthorizationヘッダーから取得
+    if token.blank? && request.headers['Authorization'].present?
+      auth_header = request.headers['Authorization']
+      # "Bearer <token>" 形式から取得
+      token = auth_header.start_with?('Bearer ') ? auth_header[7..] : auth_header
+      Rails.logger.debug "[DEBUG] Token from Authorization header: #{token&.slice(0, 50)}"
+    else
+      Rails.logger.debug "[DEBUG] Token from cookies: #{token&.slice(0, 50)}"
+    end
+
+    token
   end
 
   # リフレッシュトークンからユーザーを取得（無効ならnil）
