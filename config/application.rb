@@ -32,9 +32,19 @@ module Backend
     end
 
     # Content Security Policy設定（XSS攻撃対策）
-    config.action_dispatch.default_headers.merge!({
-      'Content-Security-Policy' => "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' #{ENV.fetch('ALLOWED_ORIGINS', 'http://localhost:5173').split(',').join(' ')};"
-    })
+    allowed_origins = ENV.fetch("ALLOWED_ORIGINS", "http://localhost:5173").split(",").join(" ")
+    csp_policy = [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: https:",
+      "font-src 'self' data:",
+      "connect-src 'self' #{allowed_origins};"
+    ].join("; ")
+
+    config.action_dispatch.default_headers.merge!(
+      "Content-Security-Policy" => csp_policy
+    )
 
     # Configuration for the application, engines, and railties goes here.
     #

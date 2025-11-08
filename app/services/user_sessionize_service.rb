@@ -25,10 +25,10 @@ module UserSessionizeService
     token = cookies[session_key]
 
     # CookieになければAuthorizationヘッダーから取得
-    if token.blank? && request.headers['Authorization'].present?
-      auth_header = request.headers['Authorization']
+    if token.blank? && request.headers["Authorization"].present?
+      auth_header = request.headers["Authorization"]
       # "Bearer <token>" 形式から取得
-      token = auth_header.start_with?('Bearer ') ? auth_header[7..] : auth_header
+      token = auth_header.start_with?("Bearer ") ? auth_header[7..] : auth_header
       Rails.logger.debug "[DEBUG] Token from Authorization header: #{token&.slice(0, 50)}"
     else
       Rails.logger.debug "[DEBUG] Token from cookies: #{token&.slice(0, 50)}"
@@ -40,26 +40,52 @@ module UserSessionizeService
   # リフレッシュトークンからユーザーを取得（無効ならnil）
   def fetch_user_from_refresh_token
     token = token_from_cookies
-    Rails.logger.debug "[DEBUG] Attempting to fetch user from refresh token..."
+    log_fetch_attempt
     user = User.from_refresh_token(token)
-    Rails.logger.debug "[DEBUG] Successfully fetched user: #{user&.id}"
+    log_fetch_success(user)
     user
   rescue JWT::InvalidJtiError => e
-    # jtiエラーの場合はcontrollerに処理を委任
-    Rails.logger.error "[ERROR] Invalid JTI: #{e.message}"
-    catch_invalid_jti
+    handle_invalid_jti_error(e)
   rescue UserAuth.not_found_exception_class => e
-    Rails.logger.error "[ERROR] User not found: #{e.message}"
-    nil
-  rescue JWT::DecodeError => e
-    Rails.logger.error "[ERROR] JWT Decode error: #{e.message}"
-    nil
-  rescue JWT::EncodeError => e
-    Rails.logger.error "[ERROR] JWT Encode error: #{e.message}"
-    nil
+    handle_not_found_error(e)
+  rescue JWT::DecodeError, JWT::EncodeError => e
+    handle_jwt_error(e)
   rescue StandardError => e
-    Rails.logger.error "[ERROR] Unexpected error in fetch_user_from_refresh_token: #{e.class} - #{e.message}"
-    Rails.logger.error e.backtrace.first(5).join("\n")
+    handle_unexpected_error(e)
+  end
+
+  # トークン取得試行をログ出力
+  def log_fetch_attempt
+    Rails.logger.debug "[DEBUG] Attempting to fetch user from refresh token..."
+  end
+
+  # ユーザー取得成功をログ出力
+  def log_fetch_success(user)
+    Rails.logger.debug "[DEBUG] Successfully fetched user: #{user&.id}"
+  end
+
+  # Invalid JTI エラー処理
+  def handle_invalid_jti_error(error)
+    Rails.logger.error "[ERROR] Invalid JTI: #{error.message}"
+    catch_invalid_jti
+  end
+
+  # ユーザー未検出エラー処理
+  def handle_not_found_error(error)
+    Rails.logger.error "[ERROR] User not found: #{error.message}"
+    nil
+  end
+
+  # JWT関連エラー処理
+  def handle_jwt_error(error)
+    Rails.logger.error "[ERROR] JWT error: #{error.message}"
+    nil
+  end
+
+  # 予期しないエラー処理
+  def handle_unexpected_error(error)
+    Rails.logger.error "[ERROR] Unexpected error: #{error.class} - #{error.message}"
+    Rails.logger.error error.backtrace.first(5).join("\n")
     nil
   end
 
