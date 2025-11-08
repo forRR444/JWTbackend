@@ -6,7 +6,7 @@ gem "bootsnap", require: false
 gem "kamal", require: false
 gem "pg", "~> 1.1"
 gem "puma", ">= 5.0"
-gem "rails", "~> 8.0.2", ">= 8.0.2.1"
+gem "rails", "~> 8.1.1"
 # Docker環境では複数データベース設定が必要なため、シンプルな設定を使用
 # gem "solid_cable"
 # gem "solid_cache"
