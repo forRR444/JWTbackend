@@ -108,9 +108,7 @@ module Api
       # タグを含むパラメータを返す（tagsをtag_namesに変換）
       def meal_params_with_tags
         permitted = meal_params
-        if params[:meal][:tags].present?
-          permitted[:tag_names] = params[:meal][:tags]
-        end
+        permitted[:tag_names] = params[:meal][:tags] if params[:meal][:tags].present?
         permitted
       end
     end
