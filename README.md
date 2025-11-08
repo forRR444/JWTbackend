@@ -1,8 +1,14 @@
 # 食事管理アプリケーション
 
 本アプリは JWT 認証を実装した、栄養管理機能を持つフルスタック Web アプリケーションです。ユーザーは日々の食事を記録し、栄養摂取量を追跡し、目標に対する進捗を確認できます。
-![ログイン画面](./docs/screen1.png)
-![入力画面](./docs/screen2.png)
+
+<p align="center">
+  <img src="./docs/screen1.png" width="400" alt="ログイン画面">
+</p>
+
+<p align="center">
+  <img src="./docs/screen2.png" width="400" alt="入力画面">
+</p>
 
 ## デモ
 
