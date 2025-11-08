@@ -31,7 +31,7 @@ class MealCalendarService
   # 月内の食事データを取得
   def fetch_meals
     first, last = month_range
-    @user.meals.between(first, last)
+    @user.meals.includes(:tags).between(first, last)
   end
 
   # 日付ごと集計データを生成

@@ -39,7 +39,7 @@ class MealFiltersService
     date = parse_date(@params[:date])
     return @user.meals.none if date.nil?
 
-    @user.meals.on(date).order(created_at: :desc)
+    @user.meals.includes(:tags).on(date).order(created_at: :desc)
   end
 
   # 日付範囲で絞り込み
@@ -50,12 +50,12 @@ class MealFiltersService
     return @user.meals.none if from_date.nil? || to_date.nil?
     return @user.meals.none if from_date > to_date
 
-    @user.meals.between(from_date, to_date).order(created_at: :desc)
+    @user.meals.includes(:tags).between(from_date, to_date).order(created_at: :desc)
   end
 
   # デフォルト（全件・新しい順）
   def default_filter
-    @user.meals.order(created_at: :desc)
+    @user.meals.includes(:tags).order(created_at: :desc)
   end
 
   # 日付文字列をDateオブジェクトに変換（不正な場合はnilを返す）

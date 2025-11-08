@@ -24,7 +24,7 @@ module Api
 
       # 食事データを新規作成
       def create
-        meal = current_user.meals.new(meal_params)
+        meal = current_user.meals.new(meal_params_with_tags)
         if meal.save
           render json: meal.as_json, status: :created
         else
@@ -36,7 +36,7 @@ module Api
       def update
         return not_found unless authorized_meal?
 
-        if @meal.update(meal_params)
+        if @meal.update(meal_params_with_tags)
           render json: @meal.as_json
         else
           render_validation_errors(@meal)
@@ -71,7 +71,7 @@ module Api
 
       # 対象の食事データを取得
       def set_meal
-        @meal = Meal.find_by(id: params[:id])
+        @meal = Meal.includes(:tags).find_by(id: params[:id])
         not_found unless @meal
       end
 
@@ -101,9 +101,17 @@ module Api
           :grams,
           :protein,
           :fat,
-          :carbohydrate,
-          tags: [] # タグは配列で受け取る
+          :carbohydrate
         )
+      end
+
+      # タグを含むパラメータを返す（tagsをtag_namesに変換）
+      def meal_params_with_tags
+        permitted = meal_params
+        if params[:meal][:tags].present?
+          permitted[:tag_names] = params[:meal][:tags]
+        end
+        permitted
       end
     end
   end

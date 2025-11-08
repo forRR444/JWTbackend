@@ -50,16 +50,13 @@ class Meal < ApplicationRecord
 
     # 空の場合はクリア
     if cleaned_names.empty?
-      meal_tags.clear
+      association(:tags).replace([])
       return
     end
 
     tag_objects = Tag.find_or_create_by_names(cleaned_names)
     # 既存の関連を置き換え
-    meal_tags.destroy_all
-    tag_objects.each do |tag|
-      meal_tags.build(tag: tag)
-    end
+    association(:tags).replace(tag_objects)
   end
 
   # タグ名の配列を取得
