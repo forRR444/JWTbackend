@@ -62,7 +62,6 @@ module Api
         {
           token: access.token, # アクセストークン文字列
           expires: access.payload[:exp], # 有効期限
-          refresh_token: @refresh_token&.token, # リフレッシュトークン（localStorageに保存用）
           user: @user.response_json(sub: access.payload[:sub]) # ユーザー情報
         }
       end
