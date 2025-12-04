@@ -147,37 +147,89 @@ end
 - 強制ログアウトが可能（セキュリティインシデント時に有効）
 - トークンの盗難・漏洩時に即座に対応可能
 
-### 3. クロスタブ同期によるセキュリティ強化
+### 3. XSS・CSRF 対策
 
-**課題**: 複数のタブでアプリを開いている場合、1 つのタブでログアウトしても他のタブは認証状態のまま
+**課題**: Web アプリケーションにおいて、XSS（クロスサイトスクリプティング）と CSRF（クロスサイトリクエストフォージェリ）は代表的な攻撃手法であり、トークンの窃取やユーザーの意図しない操作が行われるリスクがある
 
 **解決策**:
 
-- `localStorage`の変更を`storage`イベントでリスンし、全タブで同期
-- カスタムイベント`unauthorized`を発火して、全タブでログアウト処理を実行
+**XSS 対策**:
 
-**実装（`App.tsx`）**:
+- Refresh Token を HttpOnly Cookie に保存し、JavaScript からアクセス不可に
+- Access Token のみ localStorage に保存（短い有効期限で被害を最小化）
+
+**CSRF 対策**:
+
+1. **カスタムヘッダー検証**: `X-Requested-With: XMLHttpRequest` ヘッダーがないリクエストを拒否
+2. **Authorization ヘッダー認証**: Access Token を `Authorization: Bearer` ヘッダーで送信（Cookie と異なり自動送信されない）
+
+> 両方とも「外部サイトからはカスタムヘッダーを付与できない」というブラウザの同一オリジンポリシーを利用した対策。二重に実装することで堅牢性を確保。
+
+- Cookie の `SameSite` 属性と `Secure` 属性を環境に応じて設定
+- 本番環境（クロスオリジン構成）では `SameSite=None` + `Secure=true` を使用
+
+**実装（バックエンド `token_cookie_handler.rb`）**:
+
+```ruby
+# 環境変数でSameSite属性を制御（本番: none、開発: lax）
+same_site_value = ENV.fetch("COOKIES_SAME_SITE", "lax").to_sym
+
+cookies[UserAuth.session_key] = {
+  value: refresh.token,
+  expires: Time.at(refresh.payload[:exp]),
+  http_only: true,       # XSS対策: JSからアクセス不可
+  secure: true,          # HTTPS必須（SameSite=Noneの要件）
+  same_site: same_site_value  # 本番: :none（クロスオリジン許可）
+}
+```
+
+> **補足**: 本番環境ではフロントエンド（Vercel）とバックエンド（Heroku）が異なるドメインのため、`SameSite=None` が必要。この場合、CSRF 対策は主に `X-Requested-With` ヘッダー検証で担保している。
+
+**実装（バックエンド `application_controller.rb`）**:
+
+```ruby
+# CSRF対策: XMLHttpRequestでない場合は403を返す
+before_action :xhr_request?
+
+def xhr_request?
+  return false if request.xhr?
+  render status: :forbidden, json: { error: "Forbidden" }
+end
+```
+
+**実装（フロントエンド `api.ts`）**:
 
 ```typescript
-// storageイベントでクロスタブ同期
-window.addEventListener("storage", (e) => {
-  if (e.key === "access_token" && !e.newValue) {
-    // トークンが削除されたら全タブでログアウト
-    navigate("/login");
-  }
-});
+const headers: Record<string, string> = {
+  "Content-Type": "application/json",
+  "X-Requested-With": "XMLHttpRequest", // CSRF対策①
+};
+if (token) headers["Authorization"] = `Bearer ${token}`; // CSRF対策②
 
-// unauthorizedイベントで強制ログアウト
-window.addEventListener("unauthorized", () => {
-  clearAuthTokens();
-  navigate("/login");
+await fetch(url, {
+  headers,
+  credentials: "include", // Cookie自動送信
 });
+```
+
+**実装（バックエンド `user_authenticate_service.rb`）**:
+
+```ruby
+# AuthorizationヘッダーからAccess Tokenを取得して認証
+def token_from_request_headers
+  request.headers["Authorization"]&.split&.last
+end
+
+def current_user
+  @current_user ||= User.from_access_token(token_from_request_headers)
+end
 ```
 
 **メリット**:
 
-- セキュリティリスクの低減（ログアウト忘れ防止）
-- 一貫したユーザー体験
+- Refresh Token が JavaScript から窃取されるリスクを排除
+- 外部サイトからの不正リクエストをサーバー側で拒否
+- 多層防御により、単一の対策が破られても被害を軽減
 
 ### 4. 大量データの効率的なインポート
 
