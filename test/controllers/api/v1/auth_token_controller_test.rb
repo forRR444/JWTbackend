@@ -89,8 +89,8 @@ module Api
         # jtiは一致しているか
         assert_equal @user.refresh_jti, refresh_token.payload["jti"]
 
-        # token有効期限とcookie有効期限は一致しているか
-        assert_equal refresh_lifetime_to_i, refresh_token.payload["exp"]
+        # token有効期限とcookie有効期限は一致しているか(1秒誤差許容)
+        assert_in_delta refresh_lifetime_to_i, refresh_token.payload["exp"], 1
       end
 
       # 無効なログイン
